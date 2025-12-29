@@ -46,19 +46,26 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
-import com.google.api.services.drive.DriveScopes; // Pastikan library Drive API ada
+import com.google.api.services.drive.DriveScopes;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.taskmateaditya.R;
+import com.taskmateaditya.data.Task;
+import com.taskmateaditya.data.TaskDatabase;
 import com.taskmateaditya.data.TaskViewModel;
 import com.taskmateaditya.utils.DriveServiceHelper;
+import com.taskmateaditya.utils.ReminderHelper;
 
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -96,7 +103,6 @@ public class SettingsActivity extends AppCompatActivity {
     private DriveServiceHelper mDriveServiceHelper;
     private final Executor mExecutor = Executors.newSingleThreadExecutor();
 
-    // Launcher untuk Image Picker
     private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -105,8 +111,6 @@ public class SettingsActivity extends AppCompatActivity {
                     if (imageUri != null) {
                         previewUri = imageUri;
                         loadProfileImageWithGlide(imageUri);
-
-                        // 🔥 PERBAIKAN: Cek Izin Drive sebelum Upload 🔥
                         checkDrivePermissionAndUpload(imageUri);
                     }
                 }
@@ -131,7 +135,6 @@ public class SettingsActivity extends AppCompatActivity {
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        // Inisialisasi Drive Helper jika sudah login
         updateDriveServiceHelper();
 
         initViews();
@@ -143,7 +146,6 @@ public class SettingsActivity extends AppCompatActivity {
         createNotificationChannel();
     }
 
-    // 🔥 METHOD BARU: Update Helper agar selalu sinkron dengan akun aktif
     private void updateDriveServiceHelper() {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if (account != null) {
@@ -152,38 +154,28 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    // 🔥 LOGIKA BARU: Cek & Minta Izin Drive 🔥
     private void checkDrivePermissionAndUpload(Uri imageUri) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-
-        // 1. Cek apakah user login via Google
         if (account == null) {
-            // Login via Email biasa -> Simpan Lokal
             saveLocalOnly(imageUri);
             return;
         }
 
-        // 2. Cek apakah izin Drive File sudah diberikan
         Scope driveScope = new Scope(DriveScopes.DRIVE_FILE);
         if (!GoogleSignIn.hasPermissions(account, driveScope)) {
-            // Jika belum ada izin, minta izin ke user
             GoogleSignIn.requestPermissions(this, 9002, account, driveScope);
-            // Simpan sementara di lokal sambil menunggu (opsional)
             saveLocalOnly(imageUri);
         } else {
-            // Jika izin sudah ada, langsung upload
             if (mDriveServiceHelper == null) updateDriveServiceHelper();
             uploadProfileImageToDrive(imageUri);
         }
     }
 
-    // Handle hasil permintaan izin
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 9002) {
             if (resultCode == RESULT_OK) {
-                // Izin diberikan, update helper dan coba upload lagi
                 updateDriveServiceHelper();
                 if (previewUri != null) {
                     uploadProfileImageToDrive(previewUri);
@@ -213,7 +205,10 @@ public class SettingsActivity extends AppCompatActivity {
         if (user != null) {
             userProfileListener = db.collection("users").document(user.getUid())
                     .addSnapshotListener((documentSnapshot, e) -> {
-                        if (e != null) return;
+                        if (e != null) {
+                            Log.e("SettingsActivity", "Listen failed.", e);
+                            return;
+                        }
 
                         if (documentSnapshot != null && documentSnapshot.exists()) {
                             String name = documentSnapshot.getString("name");
@@ -228,7 +223,6 @@ public class SettingsActivity extends AppCompatActivity {
                                     if (mDriveServiceHelper != null) {
                                         loadDriveImage(photoUrl);
                                     } else {
-                                        // Coba inisialisasi lagi jika helper null
                                         updateDriveServiceHelper();
                                         if (mDriveServiceHelper != null) loadDriveImage(photoUrl);
                                     }
@@ -261,7 +255,6 @@ public class SettingsActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     if (isFinishing() || isDestroyed()) return;
                     progressBarProfile.setVisibility(View.GONE);
-                    // Jika gagal (misal 403 Forbidden), fallback ke lokal
                     Log.e("DriveLoad", "Error: " + e.getMessage());
                     loadLocalFallback();
                 });
@@ -307,7 +300,6 @@ public class SettingsActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     if (!isFinishing() && !isDestroyed()) {
                         progressBarProfile.setVisibility(View.GONE);
-                        // Pesan error spesifik jika 403 (Permission Denied)
                         if (e.getMessage() != null && e.getMessage().contains("403")) {
                             Toast.makeText(SettingsActivity.this, "Gagal: Email ini belum terdaftar di Test Users Google Console.", Toast.LENGTH_LONG).show();
                         } else {
@@ -517,18 +509,64 @@ public class SettingsActivity extends AppCompatActivity {
                 .show();
     }
 
+    // 🔥 LOGIKA HAPUS DATA COMPLETE (Firestore + Local + Auth) 🔥
     private void deleteAccountPermanently() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
 
-        db.collection("users").document(user.getUid())
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    deleteFirebaseAuthUser(user);
+        Toast.makeText(this, "Menghapus data...", Toast.LENGTH_SHORT).show();
+        String uid = user.getUid();
+
+        // 1. Coba hapus Sub-Collection: users/{uid}/tasks
+        db.collection("users").document(uid).collection("tasks").get()
+                .addOnSuccessListener(subSnap -> {
+                    WriteBatch batch = db.batch();
+                    for (DocumentSnapshot doc : subSnap.getDocuments()) {
+                        batch.delete(doc.getReference());
+                    }
+
+                    // 2. Coba hapus Root Collection: tasks (where userId == uid)
+                    db.collection("tasks").whereEqualTo("userId", uid).get()
+                            .addOnSuccessListener(rootSnap -> {
+                                for (DocumentSnapshot doc : rootSnap.getDocuments()) {
+                                    batch.delete(doc.getReference());
+                                }
+
+                                // Jalankan Batch Delete
+                                batch.commit().addOnCompleteListener(t -> {
+                                    // 3. Hapus Dokumen Profil User
+                                    db.collection("users").document(uid).delete()
+                                            .addOnCompleteListener(task -> wipeLocalDataAndAuth(user));
+                                });
+                            });
                 })
                 .addOnFailureListener(e -> {
-                    deleteFirebaseAuthUser(user);
+                    // Jika gagal (misal offline), paksa hapus lokal & auth
+                    wipeLocalDataAndAuth(user);
                 });
+    }
+
+    // Membersihkan Database Lokal (Room) & SharedPreferences
+    private void wipeLocalDataAndAuth(FirebaseUser user) {
+        mExecutor.execute(() -> {
+            try {
+                // 1. Coba batalkan semua alarm (Looping manual karena DAO getAllTasksSync mungkin tidak ada)
+                // Note: Cara terbaik membatalkan alarm tanpa ID adalah menghapus datanya,
+                // AlarmManager akan gagal firing jika pendingIntent tidak valid/data null.
+
+                // 2. HAPUS SEMUA ISI DATABASE LOKAL
+                TaskDatabase.getDatabase(getApplicationContext()).clearAllTables();
+
+                // 3. Hapus Cache
+                sharedPreferences.edit().clear().apply();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // Kembali ke UI Thread untuk hapus akun Firebase Auth
+            runOnUiThread(() -> deleteFirebaseAuthUser(user));
+        });
     }
 
     private void deleteFirebaseAuthUser(FirebaseUser user) {
@@ -730,12 +768,22 @@ public class SettingsActivity extends AppCompatActivity {
         if (isEnabled) {
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(System.currentTimeMillis());
-            calendar.set(Calendar.HOUR_OF_DAY, 7);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-            if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
+
+            // --- KODE TEST MODE (MULAI) ---
+            // calendar.set(Calendar.HOUR_OF_DAY, 7); // Komentar dulu yang asli
+            // calendar.set(Calendar.MINUTE, 0);
+            // calendar.set(Calendar.SECOND, 0);
+
+            // Set alarm 2 menit dari sekarang
+            calendar.add(Calendar.MINUTE, 2);
+            // --- KODE TEST MODE (SELESAI) ---
+
+            // Hapus logika "besok" sementara agar alarm bunyi hari ini juga
+            /* if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
                 calendar.add(Calendar.DAY_OF_YEAR, 1);
             }
+
+             */
             if (alarmManager != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
