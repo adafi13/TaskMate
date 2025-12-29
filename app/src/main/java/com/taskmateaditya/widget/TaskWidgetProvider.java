@@ -23,30 +23,46 @@ public class TaskWidgetProvider extends AppWidgetProvider {
     }
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
+        // 1. Setup Service Intent (Menghubungkan ke Adapter)
         Intent intent = new Intent(context, TaskWidgetService.class);
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
 
+        // 2. Load Layout
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_task_list);
-        views.setRemoteAdapter(R.id.widget_list_view, intent);
-        views.setEmptyView(R.id.widget_list_view, R.id.appwidget_empty_view);
 
-        // Template Intent untuk menangani klik item
+        // 3. Bind ListView & Empty View
+        // Pastikan ID ini sama persis dengan yang ada di widget_task_list.xml
+        views.setRemoteAdapter(R.id.widgetListView, intent);
+        views.setEmptyView(R.id.widgetListView, R.id.empty_view);
+
+        // 4. Intent untuk Klik Item (Membuka Detail Tugas)
         Intent clickIntent = new Intent(context, DetailTaskActivity.class);
         PendingIntent clickPendingIntent = PendingIntent.getActivity(
-                context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
-        views.setPendingIntentTemplate(R.id.widget_list_view, clickPendingIntent);
+                context, 0, clickIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+        views.setPendingIntentTemplate(R.id.widgetListView, clickPendingIntent);
 
-        // Klik Header untuk buka Home
+        // 5. Intent untuk Tombol Tambah (+) (Membuka Halaman Tambah Tugas)
+        Intent addIntent = new Intent(context, DetailTaskActivity.class);
+        PendingIntent addPendingIntent = PendingIntent.getActivity(
+                context, 0, addIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        views.setOnClickPendingIntent(R.id.btnWidgetAdd, addPendingIntent);
+
+        // 6. Intent untuk Klik Header (Membuka Home)
         Intent homeIntent = new Intent(context, HomeActivity.class);
         PendingIntent homePendingIntent = PendingIntent.getActivity(
-                context, 0, homeIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        views.setOnClickPendingIntent(R.id.appwidget_empty_view, homePendingIntent); // Jika kosong, klik text buka home
+                context, 0, homeIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        // Kita pasang pending intent ini pada judul "TaskMate" jika ingin bisa diklik
+        // views.setOnClickPendingIntent(R.id.text_view_title_id, homePendingIntent);
 
+        // Update Widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
-    // Method Helper untuk refresh widget dari Activity lain
+    // Method Helper untuk Refresh Widget Real-time
     public static void sendRefreshBroadcast(Context context) {
         Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
         intent.setComponent(new ComponentName(context, TaskWidgetProvider.class));
@@ -54,6 +70,8 @@ public class TaskWidgetProvider extends AppWidgetProvider {
 
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(context, TaskWidgetProvider.class));
-        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list_view);
+
+        // Refresh data ListView
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widgetListView);
     }
 }

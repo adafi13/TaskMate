@@ -1,42 +1,48 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:background="@android:color/white"
-    android:padding="8dp">
-
-    <ImageView
-        android:id="@+id/widget_priority_indicator"
-        android:layout_width="4dp"
-        android:layout_height="match_parent"
-        android:background="@color/tm_green"
-        android:contentDescription="Priority"
-        android:layout_marginEnd="8dp"/>
+    android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:id="@+id/widgetItemContainer"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
-
+        android:background="@drawable/bg_rounded_dialog"
+        android:orientation="vertical"
+        android:padding="12dp">
         <TextView
-            android:id="@+id/widget_item_title"
+            android:id="@+id/widgetTaskTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Judul Tugas"
-            android:textColor="@android:color/black"
+            android:textColor="#212121"
             android:textStyle="bold"
             android:textSize="14sp"
             android:maxLines="1"
-            android:ellipsize="end" />
+            android:ellipsize="end"/>
 
-        <TextView
-            android:id="@+id/widget_item_date"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="2023-10-10"
-            android:textColor="@android:color/darker_gray"
-            android:textSize="12sp" />
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:id="@+id/widgetTaskDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="12 Jan, 10:00"
+                android:textColor="#00C853"
+                android:textSize="12sp"/>
+
+            <TextView
+                android:id="@+id/widgetTaskPriority"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="• Prioritas Tinggi"
+                android:textColor="#D32F2F"
+                android:textSize="12sp"/>
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>
