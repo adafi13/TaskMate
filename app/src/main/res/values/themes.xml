@@ -1,0 +1,28 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.TaskMate" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/tm_green</item>
+        <item name="colorOnPrimary">@color/tm_black</item>
+
+        <item name="android:colorBackground">@color/tm_background</item>
+    </style>
+
+    <style name="Theme.TaskMate.Launcher" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="windowSplashScreenBackground">@color/tm_background</item>
+
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
+
+        <item name="postSplashScreenTheme">@style/Theme.TaskMate</item>
+    </style>
+
+
+    <style name="ShapeAppearance.TaskMate.ChatBubbleUser" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">18dp</item>
+        <item name="cornerSizeTopRight">2dp</item> <item name="cornerSizeBottomLeft">18dp</item>
+        <item name="cornerSizeBottomRight">18dp</item>
+    </style>
+
+
+</resources>

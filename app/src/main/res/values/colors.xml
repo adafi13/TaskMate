@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="tm_background">#FFFFFF</color>
+    <color name="tm_green">#22C55E</color>
+    <color name="tm_black">#111111</color>
+    <color name="tm_gray">#777777</color>
+    <color name="tm_gray_light">#AAAAAA</color>
+    <color name="tm_card_background">#FFFFFF</color>
+
+    <color name="tm_divider">#E0E0E0</color>
+    <color name="tm_red_error">#EF4444</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="custom_black">#1A1A1A</color>
+    <color name="tm_green_chip_selector">#00FF00</color>
+    <color name="priority_high">#FF5252</color>   <color name="priority_medium">#FFC107</color> <color name="priority_low">#00C853</color>    <color name="dark_surface">#1E1E1E</color>    <color name="dark_background">#121212</color>
+</resources>

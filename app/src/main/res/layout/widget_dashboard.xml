@@ -1,0 +1,64 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_widget_rounded"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tv_widget_greeting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Selamat Pagi,"
+        android:textColor="@color/tm_gray"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv_widget_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_widget_greeting"
+        android:text="User TaskMate"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@id/btn_widget_add"
+        android:layout_marginEnd="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_widget_stats"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 Selesai, 0 Tersisa"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp"/>
+
+        <ProgressBar
+            android:id="@+id/widget_progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:max="100"
+            android:progress="0"
+            android:progressDrawable="@drawable/bg_category_badge"
+            android:progressTint="@color/tm_green"/>
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/btn_widget_add"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/bg_fab_circle"
+        android:src="@drawable/ic_baseline_add_24"
+        android:tint="@android:color/white"
+        android:contentDescription="Add Task" />
+
+</RelativeLayout>

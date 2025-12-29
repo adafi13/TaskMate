@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@android:color/white"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/widget_priority_indicator"
+        android:layout_width="4dp"
+        android:layout_height="match_parent"
+        android:background="@color/tm_green"
+        android:contentDescription="Priority"
+        android:layout_marginEnd="8dp"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/widget_item_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Judul Tugas"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/widget_item_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="2023-10-10"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="12sp" />
+    </LinearLayout>
+</LinearLayout>

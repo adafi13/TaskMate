@@ -1,0 +1,101 @@
+<resources>
+    <string name="app_name">TaskMate Aditya</string>
+
+    <string name="tagline">TaskMate Aplikasi pencatat tugas\nKelola deadline dan belajar lebih tenang</string>
+    <string name="get_started">Get Started</string>
+    <string name="hello_fmt">Halo, %1$s!</string>
+    <string name="loc_fmt">%1$s, %2$s</string>
+    <string name="detecting_location">Mendeteksi lokasi…</string>
+
+    <string name="login_title">Login</string>
+    <string name="email_hint_login">Username or Email</string>
+    <string name="password_hint">Password</string>
+    <string name="login_button_google">Masuk dengan Google</string>
+    <string name="login_button_signin">Login ke TaskMate</string>
+    <string name="dont_have_account">Already have an account?</string>
+    <string name="register_now">Register</string>
+
+    <string name="username_hint">Username</string>
+    <string name="email_hint">Email</string>
+    <string name="confirm_password_hint">Confirm Password</string>
+    <string name="register_button_text">Register Now</string>
+    <string name="already_have_account">Already have an account?</string>
+
+    <string name="kembali">Kembali</string>
+    <string name="empty_task_title">Belum Ada Tugas</string>
+    <string name="empty_task_subtitle">Tambahkan tugas kamu mulai dari yang dekat dengan deadline</string>
+    <string name="add_task_button">Tambah Tugas</string>
+
+    <string name="default_web_client_id">771269035526-p0k2nc48839jn3niinisen9vrnkp7ufg.apps.googleusercontent.com</string>
+
+    <string-array name="priority_options">
+        <item>Tinggi</item>
+        <item>Sedang</item>
+        <item>Rendah</item>
+    </string-array>
+
+    <string-array name="category_options">
+        <item>Sekolah/Kuliah</item>
+        <item>Pribadi</item>
+        <item>Pekerjaan</item>
+        <item>Lain-lain</item>
+    </string-array>
+
+    <string name="title_settings">Pengaturan</string>
+    <string name="label_user_taskmate">Pengguna Taskmate</string>
+
+    <string name="stat_task">Tugas</string>
+    <string name="stat_done">Selesai</string>
+    <string name="stat_pending">Tertunda</string>
+
+    <string name="header_general_settings">PENGATURAN UMUM</string>
+    <string name="switch_notification">Notifikasi Real-time</string>
+    <string name="switch_reminder">Pengingat Harian (07:00)</string>
+    <string name="switch_dark_mode">Mode Gelap</string>
+
+    <string name="header_others">LAINNYA</string>
+    <string name="btn_feedback">Bantuan &amp; Masukan</string>
+    <string name="btn_change_password">Ubah Password</string>  <string name="btn_logout">Keluar dari Akun</string>
+    <string name="btn_delete_account">Hapus Akun Permanen</string> <string name="app_credit">TaskMate by Aditya</string>
+    <string name="app_version_prefix">Versi</string>
+    <string name="app_academic_credit">Dibuat untuk pembelajaran Pemrograman Mobile 1\nDosen Pengampu: Donny Maulana, S.Kom., M.M.S.I.</string>
+
+    <string name="notif_channel_name">TaskMate Notifications</string>
+    <string name="notif_active_title">Notifikasi Aktif</string>
+    <string name="notif_active_msg">Anda akan menerima update tugas.</string>
+
+    <string name="msg_uploading">Sinkronisasi Cloud...</string>
+    <string name="msg_sync_success">Tersinkron!</string>
+    <string name="msg_saved_local">Disimpan lokal</string>
+    <string name="msg_photo_not_ready">Foto belum siap</string>
+    <string name="msg_reminder_on">Pengingat Harian Aktif (07:00)</string>
+    <string name="msg_reminder_off">Pengingat Harian Dimatikan</string>
+
+    <string name="dialog_title_edit_name">Ubah Nama</string>
+    <string name="hint_new_name">Nama Lengkap Baru</string>
+    <string name="btn_save">Simpan</string>
+    <string name="msg_name_updated">Nama diperbarui!</string>
+    <string name="msg_name_update_failed">Gagal update nama.</string>
+    <string name="msg_name_empty">Nama tidak boleh kosong</string>
+
+    <string name="dialog_title_change_pass">Ubah Password</string>
+    <string name="dialog_msg_change_pass">Kirim link reset password ke email Anda?</string>
+    <string name="msg_pass_email_sent">Link reset password telah dikirim ke email.</string>
+
+    <string name="dialog_title_delete_account">Hapus Akun?</string>
+    <string name="dialog_msg_delete_account">PERINGATAN: Semua tugas dan data Anda akan dihapus permanen. Tindakan ini tidak bisa dibatalkan.</string>
+    <string name="btn_delete_confirm">Ya, Hapus Selamanya</string>
+    <string name="msg_account_deleted">Akun berhasil dihapus.</string>
+    <string name="error_delete_account">Gagal hapus akun. Login ulang dan coba lagi.</string>
+
+    <string name="dialog_title_logout">Konfirmasi Keluar</string>
+    <string name="dialog_msg_logout">Yakin ingin keluar dari akun TaskMate Anda?</string>
+    <string name="btn_yes_logout">Ya, Keluar</string>
+    <string name="btn_cancel">Batal</string>
+
+    <string name="default_user_name">Nama Pengguna</string>
+    <string name="default_user_email">email@example.com</string>
+    <string name="default_user_role">Pengguna TaskMate</string>
+    <string name="default_stat_value">-</string>
+
+</resources>
