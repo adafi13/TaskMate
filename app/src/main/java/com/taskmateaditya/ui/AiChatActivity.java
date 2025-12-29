@@ -22,7 +22,7 @@ import okhttp3.*;
 public class AiChatActivity extends AppCompatActivity {
 
     // 🔥 API Key Groq Anda (Pastikan benar!)
-    private static final String GROQ_API_KEY = ""; //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
+    private static final String GROQ_API_KEY = ""; //
 
     private static final String GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
     private static final String GROQ_MODEL = "llama-3.1-8b-instant";
