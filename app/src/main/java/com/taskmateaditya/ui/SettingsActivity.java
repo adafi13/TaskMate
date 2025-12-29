@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -42,9 +43,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.api.services.drive.DriveScopes; // Pastikan library Drive API ada
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -53,8 +57,6 @@ import com.taskmateaditya.R;
 import com.taskmateaditya.data.TaskViewModel;
 import com.taskmateaditya.utils.DriveServiceHelper;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -89,24 +91,23 @@ public class SettingsActivity extends AppCompatActivity {
 
     private Uri currentProfileUri;
     private Uri previewUri;
+    private Object currentImageModel;
 
     private DriveServiceHelper mDriveServiceHelper;
     private final Executor mExecutor = Executors.newSingleThreadExecutor();
 
+    // Launcher untuk Image Picker
     private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     Uri imageUri = result.getData().getData();
                     if (imageUri != null) {
-                        loadProfileImageWithGlide(imageUri);
                         previewUri = imageUri;
+                        loadProfileImageWithGlide(imageUri);
 
-                        if (mDriveServiceHelper != null) {
-                            uploadProfileImageToDrive(imageUri);
-                        } else {
-                            saveLocalOnly(imageUri);
-                        }
+                        // 🔥 PERBAIKAN: Cek Izin Drive sebelum Upload 🔥
+                        checkDrivePermissionAndUpload(imageUri);
                     }
                 }
             }
@@ -130,20 +131,67 @@ public class SettingsActivity extends AppCompatActivity {
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if (account != null) {
-            mDriveServiceHelper = new DriveServiceHelper(
-                    DriveServiceHelper.getGoogleDriveService(this, account, "TaskMate"));
-        }
+        // Inisialisasi Drive Helper jika sudah login
+        updateDriveServiceHelper();
 
         initViews();
         displayAppVersion();
-
         displayUserData();
         loadStatistics();
         updateSwitchStates();
         setupListeners();
         createNotificationChannel();
+    }
+
+    // 🔥 METHOD BARU: Update Helper agar selalu sinkron dengan akun aktif
+    private void updateDriveServiceHelper() {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account != null) {
+            mDriveServiceHelper = new DriveServiceHelper(
+                    DriveServiceHelper.getGoogleDriveService(this, account, "TaskMate"));
+        }
+    }
+
+    // 🔥 LOGIKA BARU: Cek & Minta Izin Drive 🔥
+    private void checkDrivePermissionAndUpload(Uri imageUri) {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+
+        // 1. Cek apakah user login via Google
+        if (account == null) {
+            // Login via Email biasa -> Simpan Lokal
+            saveLocalOnly(imageUri);
+            return;
+        }
+
+        // 2. Cek apakah izin Drive File sudah diberikan
+        Scope driveScope = new Scope(DriveScopes.DRIVE_FILE);
+        if (!GoogleSignIn.hasPermissions(account, driveScope)) {
+            // Jika belum ada izin, minta izin ke user
+            GoogleSignIn.requestPermissions(this, 9002, account, driveScope);
+            // Simpan sementara di lokal sambil menunggu (opsional)
+            saveLocalOnly(imageUri);
+        } else {
+            // Jika izin sudah ada, langsung upload
+            if (mDriveServiceHelper == null) updateDriveServiceHelper();
+            uploadProfileImageToDrive(imageUri);
+        }
+    }
+
+    // Handle hasil permintaan izin
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 9002) {
+            if (resultCode == RESULT_OK) {
+                // Izin diberikan, update helper dan coba upload lagi
+                updateDriveServiceHelper();
+                if (previewUri != null) {
+                    uploadProfileImageToDrive(previewUri);
+                }
+            } else {
+                Toast.makeText(this, "Izin Drive ditolak. Foto hanya disimpan lokal.", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @Override
@@ -175,14 +223,24 @@ public class SettingsActivity extends AppCompatActivity {
 
                             String photoUrl = documentSnapshot.getString("photoUrl");
                             if (photoUrl != null && !photoUrl.isEmpty()) {
-                                if (photoUrl.startsWith("googledrive://") && mDriveServiceHelper != null) {
-                                    loadDriveImage(photoUrl);
+                                if (photoUrl.startsWith("googledrive://")) {
+                                    previewUri = null;
+                                    if (mDriveServiceHelper != null) {
+                                        loadDriveImage(photoUrl);
+                                    } else {
+                                        // Coba inisialisasi lagi jika helper null
+                                        updateDriveServiceHelper();
+                                        if (mDriveServiceHelper != null) loadDriveImage(photoUrl);
+                                    }
                                 } else {
+                                    previewUri = Uri.parse(photoUrl);
                                     loadProfileImageWithGlide(photoUrl);
                                 }
+                            } else {
+                                loadLocalFallback();
                             }
                         } else {
-                            loadSavedProfile();
+                            loadLocalFallback();
                         }
                     });
         }
@@ -190,12 +248,76 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void loadDriveImage(String photoUrl) {
         String fileId = photoUrl.replace("googledrive://", "");
+        progressBarProfile.setVisibility(View.VISIBLE);
+
         mDriveServiceHelper.readFile(fileId)
                 .addOnSuccessListener(pair -> {
                     if (isFinishing() || isDestroyed()) return;
+                    progressBarProfile.setVisibility(View.GONE);
                     byte[] imageBytes = pair.second;
+                    currentImageModel = imageBytes;
                     loadProfileImageWithGlide(imageBytes);
+                })
+                .addOnFailureListener(e -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    progressBarProfile.setVisibility(View.GONE);
+                    // Jika gagal (misal 403 Forbidden), fallback ke lokal
+                    Log.e("DriveLoad", "Error: " + e.getMessage());
+                    loadLocalFallback();
                 });
+    }
+
+    private void uploadProfileImageToDrive(Uri uri) {
+        Toast.makeText(this, getString(R.string.msg_uploading), Toast.LENGTH_SHORT).show();
+        progressBarProfile.setVisibility(View.VISIBLE);
+
+        mExecutor.execute(() -> {
+            try {
+                String fileId = mDriveServiceHelper.uploadFile(
+                        getContentResolver(),
+                        uri,
+                        "tm_profile_" + System.currentTimeMillis() + ".jpg");
+
+                if (fileId != null) {
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if (user != null) {
+                        String driveUriString = "googledrive://" + fileId;
+                        Uri driveUri = Uri.parse(driveUriString);
+
+                        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                .setPhotoUri(driveUri)
+                                .build();
+
+                        user.updateProfile(profileUpdates).addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                updateFirestoreProfile(user.getUid(), null, driveUriString);
+
+                                runOnUiThread(() -> {
+                                    if (isFinishing() || isDestroyed()) return;
+                                    progressBarProfile.setVisibility(View.GONE);
+                                    Toast.makeText(SettingsActivity.this, getString(R.string.msg_sync_success), Toast.LENGTH_SHORT).show();
+                                    sharedPreferences.edit().remove(KEY_PROFILE_URI).apply();
+                                });
+                            }
+                        });
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> {
+                    if (!isFinishing() && !isDestroyed()) {
+                        progressBarProfile.setVisibility(View.GONE);
+                        // Pesan error spesifik jika 403 (Permission Denied)
+                        if (e.getMessage() != null && e.getMessage().contains("403")) {
+                            Toast.makeText(SettingsActivity.this, "Gagal: Email ini belum terdaftar di Test Users Google Console.", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(SettingsActivity.this, "Gagal upload ke Drive, menyimpan lokal.", Toast.LENGTH_SHORT).show();
+                        }
+                        saveLocalOnly(uri);
+                    }
+                });
+            }
+        });
     }
 
     private void initViews() {
@@ -235,6 +357,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void loadProfileImageWithGlide(Object model) {
         if (isFinishing() || isDestroyed()) return;
+        currentImageModel = model;
         Glide.with(this)
                 .load(model)
                 .placeholder(R.drawable.ic_tm_logo)
@@ -250,84 +373,24 @@ public class SettingsActivity extends AppCompatActivity {
             getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
             sharedPreferences.edit().putString(KEY_PROFILE_URI, uri.toString()).apply();
             previewUri = uri;
+            loadProfileImageWithGlide(uri);
             Toast.makeText(this, getString(R.string.msg_saved_local), Toast.LENGTH_SHORT).show();
         } catch (Exception e) {}
-    }
-
-    private void loadSavedProfile() {
-        if (isFinishing() || isDestroyed()) return;
-
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-        if (user != null && user.getPhotoUrl() != null) {
-            String photoUrl = user.getPhotoUrl().toString();
-
-            if (photoUrl.startsWith("googledrive://") && mDriveServiceHelper != null) {
-                progressBarProfile.setVisibility(View.VISIBLE);
-                loadDriveImage(photoUrl);
-                progressBarProfile.setVisibility(View.GONE);
-            } else {
-                currentProfileUri = user.getPhotoUrl();
-                previewUri = currentProfileUri;
-                loadProfileImageWithGlide(currentProfileUri);
-            }
-        } else {
-            loadLocalFallback();
-        }
     }
 
     private void loadLocalFallback() {
         String uriString = sharedPreferences.getString(KEY_PROFILE_URI, null);
         if (uriString != null) {
-            currentProfileUri = Uri.parse(uriString);
-            previewUri = currentProfileUri;
-            loadProfileImageWithGlide(currentProfileUri);
-        }
-    }
-
-    private void uploadProfileImageToDrive(Uri uri) {
-        Toast.makeText(this, getString(R.string.msg_uploading), Toast.LENGTH_SHORT).show();
-        progressBarProfile.setVisibility(View.VISIBLE);
-
-        mExecutor.execute(() -> {
-            try {
-                String fileId = mDriveServiceHelper.uploadFile(
-                        getContentResolver(),
-                        uri,
-                        "tm_profile_" + System.currentTimeMillis() + ".jpg");
-
-                if (fileId != null) {
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                    if (user != null) {
-                        Uri driveUri = Uri.parse("googledrive://" + fileId);
-
-                        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                .setPhotoUri(driveUri)
-                                .build();
-
-                        user.updateProfile(profileUpdates).addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                updateFirestoreProfile(user.getUid(), null, driveUri.toString());
-
-                                runOnUiThread(() -> {
-                                    if (isFinishing() || isDestroyed()) return;
-                                    progressBarProfile.setVisibility(View.GONE);
-                                    Toast.makeText(SettingsActivity.this, getString(R.string.msg_sync_success), Toast.LENGTH_SHORT).show();
-                                    sharedPreferences.edit().remove(KEY_PROFILE_URI).apply();
-                                });
-                            }
-                        });
-                    }
-                }
-            } catch (Exception e) {
-                runOnUiThread(() -> {
-                    if (!isFinishing() && !isDestroyed()) {
-                        progressBarProfile.setVisibility(View.GONE);
-                        saveLocalOnly(uri);
-                    }
-                });
+            Uri uri = Uri.parse(uriString);
+            previewUri = uri;
+            loadProfileImageWithGlide(uri);
+        } else {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null && user.getPhotoUrl() != null) {
+                previewUri = user.getPhotoUrl();
+                loadProfileImageWithGlide(user.getPhotoUrl());
             }
-        });
+        }
     }
 
     private void updateFirestoreProfile(String uid, String name, String photoUrl) {
@@ -398,14 +461,11 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    // --- PERBAIKAN: GANTI METHOD showChangePasswordDialog UNTUK MENAMPILKAN DIALOG SPAM ---
     private void showChangePasswordDialog() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            // Cek provider login, Google tidak bisa ganti pass di sini
             for (com.google.firebase.auth.UserInfo profile : user.getProviderData()) {
                 if (profile.getProviderId().equals("google.com")) {
-                    // Gunakan Dialog, bukan Toast, agar terbaca jelas
                     new AlertDialog.Builder(this)
                             .setTitle("Akun Google")
                             .setMessage("Anda login menggunakan Google. Silakan ubah password melalui pengaturan akun Google Anda.")
@@ -424,7 +484,6 @@ public class SettingsActivity extends AppCompatActivity {
                         FirebaseAuth.getInstance().sendPasswordResetEmail(user.getEmail())
                                 .addOnCompleteListener(task -> {
                                     if (task.isSuccessful()) {
-                                        // TAMPILKAN DIALOG PERINGATAN SPAM (BUKAN TOAST)
                                         showSpamWarningDialog(user.getEmail());
                                     } else {
                                         Toast.makeText(this, "Gagal mengirim email: " +
@@ -438,7 +497,6 @@ public class SettingsActivity extends AppCompatActivity {
                 .show();
     }
 
-    // Helper Method Baru untuk Dialog Spam
     private void showSpamWarningDialog(String email) {
         new AlertDialog.Builder(this)
                 .setTitle("Email Terkirim! 📧")
@@ -447,12 +505,11 @@ public class SettingsActivity extends AppCompatActivity {
                 .setPositiveButton("Mengerti", null)
                 .show();
     }
-    // --------------------------------------------------------------------------------------
 
     private void showDeleteAccountDialog() {
         new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.dialog_title_delete_account))
-                .setMessage(getString(R.string.dialog_msg_delete_account))
+                .setMessage("PERINGATAN: Tindakan ini permanen. Semua data tugas dan profil akan hilang selamanya.\n\nYakin ingin menghapus?")
                 .setPositiveButton(getString(R.string.btn_delete_confirm), (dialog, which) -> {
                     deleteAccountPermanently();
                 })
@@ -462,19 +519,67 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void deleteAccountPermanently() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            db.collection("users").document(user.getUid()).delete();
+        if (user == null) return;
 
-            user.delete().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    Toast.makeText(this, getString(R.string.msg_account_deleted), Toast.LENGTH_SHORT).show();
-                    navigateToLogin();
-                } else {
-                    Toast.makeText(this, getString(R.string.error_delete_account), Toast.LENGTH_LONG).show();
-                    performLogout();
+        db.collection("users").document(user.getUid())
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    deleteFirebaseAuthUser(user);
+                })
+                .addOnFailureListener(e -> {
+                    deleteFirebaseAuthUser(user);
+                });
+    }
+
+    private void deleteFirebaseAuthUser(FirebaseUser user) {
+        user.delete().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(SettingsActivity.this, getString(R.string.msg_account_deleted), Toast.LENGTH_SHORT).show();
+                signOutAndExit();
+            } else {
+                try {
+                    throw task.getException();
+                } catch (FirebaseAuthRecentLoginRequiredException e) {
+                    new AlertDialog.Builder(SettingsActivity.this)
+                            .setTitle("Login Ulang Diperlukan")
+                            .setMessage("Demi keamanan, Anda harus logout dan login kembali sebelum menghapus akun ini.")
+                            .setPositiveButton("Logout Sekarang", (dialog, which) -> performLogout())
+                            .setCancelable(false)
+                            .show();
+                } catch (Exception e) {
+                    Toast.makeText(SettingsActivity.this, "Gagal hapus akun: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
-            });
+            }
+        });
+    }
+
+    private void showLogoutConfirmationDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.dialog_title_logout))
+                .setMessage(getString(R.string.dialog_msg_logout))
+                .setPositiveButton(getString(R.string.btn_yes_logout), (dialog, which) -> performLogout())
+                .setNegativeButton(getString(R.string.btn_cancel), null)
+                .show();
+    }
+
+    private void performLogout() {
+        FirebaseAuth.getInstance().signOut();
+        signOutAndExit();
+    }
+
+    private void signOutAndExit() {
+        if (mGoogleSignInClient != null) {
+            mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> navigateToLogin());
+        } else {
+            navigateToLogin();
         }
+    }
+
+    private void navigateToLogin() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void updateSwitchStates() {
@@ -499,15 +604,19 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         cardProfileImage.setOnClickListener(v -> {
-            if (previewUri != null) {
-                Intent intent = new Intent(this, ImagePreviewActivity.class);
-                intent.putExtra("IMAGE_URI", previewUri.toString());
-                try {
-                    ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                            this, imgProfile, "profile_transform");
-                    startActivity(intent, options.toBundle());
-                } catch (Exception e) {
-                    startActivity(intent);
+            if (currentImageModel != null) {
+                if (previewUri != null) {
+                    Intent intent = new Intent(this, ImagePreviewActivity.class);
+                    intent.putExtra("IMAGE_URI", previewUri.toString());
+                    try {
+                        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                                this, imgProfile, "profile_transform");
+                        startActivity(intent, options.toBundle());
+                    } catch (Exception e) {
+                        startActivity(intent);
+                    }
+                } else {
+                    Toast.makeText(this, "Foto tersinkron dari Drive", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 Toast.makeText(this, getString(R.string.msg_photo_not_ready), Toast.LENGTH_SHORT).show();
@@ -658,30 +767,5 @@ public class SettingsActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         }
-    }
-
-    private void showLogoutConfirmationDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.dialog_title_logout))
-                .setMessage(getString(R.string.dialog_msg_logout))
-                .setPositiveButton(getString(R.string.btn_yes_logout), (dialog, which) -> performLogout())
-                .setNegativeButton(getString(R.string.btn_cancel), null)
-                .show();
-    }
-
-    private void performLogout() {
-        FirebaseAuth.getInstance().signOut();
-        if (mGoogleSignInClient != null) {
-            mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> navigateToLogin());
-        } else {
-            navigateToLogin();
-        }
-    }
-
-    private void navigateToLogin() {
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
     }
 }
