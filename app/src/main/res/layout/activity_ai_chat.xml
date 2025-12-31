@@ -4,90 +4,88 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F2F4F7"> <com.google.android.material.appbar.AppBarLayout
-    android:id="@+id/appBarLayout"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:elevation="0dp"
-    android:background="@android:color/white">
-
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
-        app:title="TaskMate AI 🤖"
-        app:titleTextColor="#1A1A1A"
-        app:subtitle="Powered by Groq"
-        app:subtitleTextColor="@color/tm_green"
-        app:titleCentered="false"
-        android:elevation="0dp"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#E0E0E0"/>
-</com.google.android.material.appbar.AppBarLayout>
+    android:background="@color/chat_background"
+    tools:context=".ui.AiChatActivity">
 
     <LinearLayout
-        android:id="@+id/layoutInput"
+        android:id="@+id/headerLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/tm_green"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:gravity="bottom|center_vertical"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="12dp"
-        android:background="#00FFFFFF"
-        android:layout_alignParentBottom="true">
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="2dp"
-            app:cardBackgroundColor="@android:color/white">
-
-            <EditText
-                android:id="@+id/etInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:hint="Tulis pesan..."
-                android:inputType="textCapSentences|textMultiLine"
-                android:maxLines="4"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="12dp"
-                android:textSize="15sp"
-                android:textColor="#212121"
-                android:textColorHint="#9E9E9E"/>
-        </androidx.cardview.widget.CardView>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/btnSend"
+        <ImageButton
+            android:id="@+id/btnBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_baseline_arrow_back_24"
-            android:rotation="180"
-            app:backgroundTint="@color/tm_green"
-            app:tint="@android:color/white"
-            app:elevation="2dp"
-            app:fabSize="mini"
-            android:contentDescription="Kirim" />
+            app:tint="@color/white"
+            android:contentDescription="Kembali"/>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="TaskMate AI Assistant"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvChat"
+        android:id="@+id/recyclerViewChat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/appBarLayout"
-        android:layout_above="@id/layoutInput"
+        android:layout_above="@id/bottomLayout"
+        android:layout_below="@id/headerLayout"
         android:clipToPadding="false"
-        android:paddingTop="8dp"
-        android:paddingBottom="4dp"
-        android:scrollbars="vertical"
-        android:overScrollMode="never"/>
+        android:padding="8dp" />
+
+    <LinearLayout
+        android:id="@+id/bottomLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/chat_input_background"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <EditText
+            android:id="@+id/etMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bg_rounded_dialog"
+            android:backgroundTint="@color/chat_background"
+            android:hint="Tanya sesuatu..."
+            android:textColor="@color/chat_text_primary"
+            android:textColorHint="@color/chat_text_secondary"
+            android:padding="12dp"
+            android:maxLines="4" />
+
+        <ImageButton
+            android:id="@+id/btnSend"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_fab_circle"
+            android:backgroundTint="@color/tm_green"
+            android:src="@drawable/ic_baseline_arrow_back_24"
+            android:rotation="180"
+            app:tint="@color/white"
+            android:contentDescription="Kirim"/>
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
 
 </RelativeLayout>
