@@ -9,7 +9,6 @@ import android.widget.RemoteViewsService;
 import com.taskmateaditya.R;
 import com.taskmateaditya.data.Task;
 import com.taskmateaditya.data.TaskDatabase;
-import com.taskmateaditya.ui.DetailTaskActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,11 @@ public class TaskWidgetService extends RemoteViewsService {
         public void onDataSetChanged() {
             // Ini dijalankan di background thread, aman akses Database
             if (context != null) {
-                taskList = TaskDatabase.getDatabase(context).taskDao().getActiveTasksForWidget();
+                // Pastikan database tidak null dan ambil data
+                TaskDatabase db = TaskDatabase.getDatabase(context);
+                if (db != null) {
+                    taskList = db.taskDao().getActiveTasksForWidget();
+                }
             }
         }
 
@@ -52,23 +55,37 @@ public class TaskWidgetService extends RemoteViewsService {
             if (position >= taskList.size()) return null;
 
             Task task = taskList.get(position);
+            // Pastikan layout yang dipanggil benar: item_widget_task
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.item_widget_task);
 
-            views.setTextViewText(R.id.widget_item_title, task.getTitle());
-            views.setTextViewText(R.id.widget_item_date, task.getDeadline());
+            // [PERBAIKAN 1] Sesuaikan ID dengan XML: widgetTaskTitle
+            views.setTextViewText(R.id.widgetTaskTitle, task.getTitle());
 
-            // Warna Prioritas
+            // [PERBAIKAN 2] Sesuaikan ID dengan XML: widgetTaskDate
+            views.setTextViewText(R.id.widgetTaskDate, task.getDeadline());
+
+            // Logika Warna Prioritas
             int color = Color.parseColor("#00C853"); // Default Hijau
-            if ("Tinggi".equalsIgnoreCase(task.getPriority())) color = Color.parseColor("#FF5252");
-            else if ("Sedang".equalsIgnoreCase(task.getPriority())) color = Color.parseColor("#FFC107");
+            if (task.getPriority() != null) {
+                if ("Tinggi".equalsIgnoreCase(task.getPriority())) {
+                    color = Color.parseColor("#FF5252"); // Merah
+                } else if ("Sedang".equalsIgnoreCase(task.getPriority())) {
+                    color = Color.parseColor("#FFC107"); // Kuning
+                }
+            }
 
-            views.setInt(R.id.widget_priority_indicator, "setBackgroundColor", color);
+            // [PERBAIKAN 3] Ganti logika background color menjadi text color
+            // Karena di XML kamu menggunakan TextView (widgetTaskPriority), bukan View kotak.
+            views.setTextColor(R.id.widgetTaskPriority, color);
+            views.setTextViewText(R.id.widgetTaskPriority, "• " + (task.getPriority() != null ? task.getPriority() : "Normal"));
 
             // Intent Klik per Item (Membuka Detail)
             Intent fillInIntent = new Intent();
             fillInIntent.putExtra("EXTRA_TASK_ID", task.getId());
-            views.setOnClickFillInIntent(R.id.widget_item_title, fillInIntent); // Klik pada teks judul
-            // Atau set pada root layout item jika memungkinkan di layout xml widget
+
+            // [PERBAIKAN 4] Pasang klik listener di Container agar area klik lebih luas
+            // widgetItemContainer adalah ID LinearLayout terluar di XML kamu
+            views.setOnClickFillInIntent(R.id.widgetItemContainer, fillInIntent);
 
             return views;
         }
