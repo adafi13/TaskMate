@@ -43,7 +43,7 @@ public class ReminderHelper {
         scheduleAlarm(context, task, time15Hour, "Ingat, tugas ini deadline-nya 15 jam lagi 📅", 3);
     }
 
-    // Method pembantu untuk set alarm (agar kodingan rapi)
+
     private static void scheduleAlarm(Context context, Task task, long triggerTime, String message, int idOffset) {
 
         if (triggerTime <= System.currentTimeMillis()) {
