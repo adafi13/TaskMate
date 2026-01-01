@@ -29,7 +29,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.Scope;
-import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.services.drive.DriveScopes;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -104,7 +103,6 @@ public class DetailTaskActivity extends AppCompatActivity {
         setupListeners();
     }
 
-    // --- SETUP GOOGLE DRIVE AUTH ---
     private void requestDriveSignIn() {
         GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -146,7 +144,7 @@ public class DetailTaskActivity extends AppCompatActivity {
         }
     }
 
-    // --- LOGIKA UPLOAD ---
+
     private void prepareSaveTask() {
         String title = binding.editTextTitle.getText().toString().trim();
         String deadline = binding.editTextDeadline.getText().toString().trim();
@@ -156,7 +154,7 @@ public class DetailTaskActivity extends AppCompatActivity {
             return;
         }
 
-        // Cek lagi apakah waktu alarm valid sebelum simpan (Double Check)
+
         if (binding.switchReminder.isChecked()) {
             if (alarmCalendar.getTimeInMillis() <= System.currentTimeMillis()) {
                 Toast.makeText(this, "Waktu pengingat sudah lewat, mohon atur ulang waktu.", Toast.LENGTH_LONG).show();
@@ -213,7 +211,7 @@ public class DetailTaskActivity extends AppCompatActivity {
         });
     }
 
-    // --- STANDARD UI METHODS ---
+
     private void setupNewTaskMode() {
         taskId = null;
         binding.btnDelete.setVisibility(View.GONE);
@@ -277,8 +275,10 @@ public class DetailTaskActivity extends AppCompatActivity {
         });
     }
 
+
     private void saveTaskToDatabase(String finalAttachmentUrl) {
         boolean isReminderActive = binding.switchReminder.isChecked();
+
         long reminderTime = isReminderActive ? alarmCalendar.getTimeInMillis() : 0;
 
         if (isReminderActive && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -288,6 +288,7 @@ public class DetailTaskActivity extends AppCompatActivity {
                 return;
             }
         }
+        // Cek Izin Notifikasi (Android 13+)
         if (isReminderActive && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
@@ -308,7 +309,7 @@ public class DetailTaskActivity extends AppCompatActivity {
                     binding.editTextPriority.getText().toString().isEmpty() ? "Sedang" : binding.editTextPriority.getText().toString(),
                     binding.editTextCategory.getText().toString().isEmpty() ? "Pribadi" : binding.editTextCategory.getText().toString(),
                     false,
-                    reminderTime,
+                    reminderTime, // Kita hanya perlu menyimpan waktu UTAMA ini
                     isReminderActive,
                     finalAttachmentUrl
             );
@@ -322,8 +323,11 @@ public class DetailTaskActivity extends AppCompatActivity {
                 currentTask.setNotes(binding.editTextNotes.getText().toString());
                 currentTask.setPriority(binding.editTextPriority.getText().toString());
                 currentTask.setCategory(binding.editTextCategory.getText().toString());
+
+                // Update waktu utama
                 currentTask.setReminderTime(reminderTime);
                 currentTask.setReminderActive(isReminderActive);
+
                 currentTask.setAttachmentPath(finalAttachmentUrl);
                 currentTask.setUserId(currentUserId);
                 taskViewModel.update(currentTask);
@@ -331,10 +335,12 @@ public class DetailTaskActivity extends AppCompatActivity {
             } else { return; }
         }
 
+
         if (isReminderActive) ReminderHelper.setReminder(this, taskToSave);
         else ReminderHelper.cancelReminder(this, taskToSave);
 
-        Toast.makeText(this, "Tugas disimpan!", Toast.LENGTH_SHORT).show();
+        String msg = isReminderActive ? "Tugas disimpan dengan Pengingat Bertahap!" : "Tugas disimpan!";
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         finish();
     }
 
@@ -405,7 +411,7 @@ public class DetailTaskActivity extends AppCompatActivity {
                 .show();
     }
 
-    // --- PERBAIKAN: MEMBATASI TANGGAL MASA LALU ---
+
     private void showDatePickerDialog() {
         Calendar c = Calendar.getInstance();
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year, month, day) -> {
@@ -416,29 +422,29 @@ public class DetailTaskActivity extends AppCompatActivity {
             binding.editTextDeadline.setText(sdf.format(alarmCalendar.getTime()));
         }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
 
-        // Set batas minimal tanggal ke hari ini (dikurangi 1 detik agar hari ini tetap bisa dipilih)
+
         datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
         datePickerDialog.show();
     }
 
-    // --- PERBAIKAN: MEMBATASI WAKTU MASA LALU ---
+
     private void showTimePickerDialog() {
         Calendar c = Calendar.getInstance();
         int currentHour = c.get(Calendar.HOUR_OF_DAY);
         int currentMinute = c.get(Calendar.MINUTE);
 
         new TimePickerDialog(this, (view, hourOfDay, minute) -> {
-            // Simpan waktu yang dipilih user ke variabel sementara
+
             Calendar tempCalendar = (Calendar) alarmCalendar.clone();
             tempCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             tempCalendar.set(Calendar.MINUTE, minute);
             tempCalendar.set(Calendar.SECOND, 0);
 
-            // Cek apakah waktu yang dipilih kurang dari waktu sekarang
+
             if (tempCalendar.getTimeInMillis() < System.currentTimeMillis()) {
                 Toast.makeText(this, "Alarm hanya dapat disetel untuk waktu yang akan datang.", Toast.LENGTH_SHORT).show();
             } else {
-                // Jika valid, simpan ke alarmCalendar
+
                 alarmCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                 alarmCalendar.set(Calendar.MINUTE, minute);
                 alarmCalendar.set(Calendar.SECOND, 0);

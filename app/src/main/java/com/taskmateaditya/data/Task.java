@@ -9,7 +9,6 @@ import java.util.UUID;
 @Entity(tableName = "task_table")
 public class Task implements Serializable {
 
-    // PERBAIKAN UTAMA: Menggunakan String UUID, bukan int AutoIncrement
     @PrimaryKey
     @NonNull
     private String id;
@@ -25,25 +24,22 @@ public class Task implements Serializable {
 
     // Alarm
     private long reminderTime;
+    private long preReminderTime;
     private boolean isReminderActive;
 
-    // Lampiran
     private String attachmentPath;
 
-    // Pemilik Tugas
+
     private String userId;
 
-    // --- 1. WAJIB ADA: KONSTRUKTOR KOSONG (No-Argument Constructor) ---
-    // Firebase MEMBUTUHKAN ini untuk mengubah data JSON kembali ke Object Java
     public Task() {
-        // Generate ID unik otomatis saat objek kosong dibuat
+
         this.id = UUID.randomUUID().toString();
     }
-    // ------------------------------------------------------------------
 
-    // 2. Konstruktor Utama
+
     public Task(String title, String mataKuliah, String deadline, String notes, String priority, String category, boolean isCompleted, long reminderTime, boolean isReminderActive, String attachmentPath) {
-        // Generate ID unik otomatis saat tugas baru dibuat
+
         this.id = UUID.randomUUID().toString();
 
         this.title = title;
@@ -56,15 +52,13 @@ public class Task implements Serializable {
         this.reminderTime = reminderTime;
         this.isReminderActive = isReminderActive;
         this.attachmentPath = attachmentPath;
+
     }
 
-    // --- Getter & Setter ---
 
-    // Ubah return type menjadi String
     @NonNull
     public String getId() { return id; }
 
-    // Ubah parameter menjadi String
     public void setId(@NonNull String id) { this.id = id; }
 
     public String getTitle() { return title; }
@@ -99,4 +93,7 @@ public class Task implements Serializable {
 
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
+
+    public long getPreReminderTime() { return preReminderTime; }
+    public void setPreReminderTime(long preReminderTime) { this.preReminderTime = preReminderTime; }
 }

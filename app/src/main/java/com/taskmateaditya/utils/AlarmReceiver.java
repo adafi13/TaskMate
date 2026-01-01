@@ -27,45 +27,35 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // 1. Ambil data dari Intent (Dikirim oleh ReminderHelper)
+        // 1. Ambil data dari Intent
         String taskTitle = intent.getStringExtra("TASK_TITLE");
         String taskId = intent.getStringExtra("TASK_ID");
-        String taskMessage = intent.getStringExtra("TASK_MESSAGE"); // Ambil pesan deskripsi
+        String taskMessage = intent.getStringExtra("TASK_MESSAGE");
 
         if (taskTitle != null) {
-            // A. Tampilkan Notifikasi Suara/Pop-up
-            showAlarmNotification(context, taskTitle, taskId);
+            String finalMessage = (taskMessage != null) ? taskMessage : "Pengingat: Segera kerjakan tugas Anda.";
 
-            // B. 🔥 TAMBAHAN BARU: Simpan ke Database Riwayat 🔥
-            saveNotificationToHistory(context, taskTitle, taskMessage);
+            showAlarmNotification(context, taskTitle, taskId, finalMessage);
+
+            saveNotificationToHistory(context, taskTitle, finalMessage);
         }
     }
 
-    // --- LOGIKA MENYIMPAN KE DATABASE ---
     private void saveNotificationToHistory(Context context, String title, String message) {
-        // Gunakan Executor bawaan database untuk operasi background (agar tidak memblokir UI)
         TaskDatabase.getDatabase(context).databaseWriteExecutor.execute(() -> {
-
-            String finalMsg = (message != null) ? message : "Waktunya mengerjakan tugas!";
-
-            // Buat object Log Baru
             NotificationLog log = new NotificationLog(
-                    title,              // Judul Log (Nama Tugas)
-                    finalMsg,           // Pesan Log
-                    System.currentTimeMillis(), // Waktu sekarang
-                    1                   // Tipe 1 = Urgent/Alarm
+                    title,
+                    message,
+                    System.currentTimeMillis(),
+                    1
             );
-
-            // Insert ke tabel notification_logs
             TaskDatabase.getDatabase(context).notificationDao().insert(log);
         });
     }
-    // ------------------------------------
 
-    private void showAlarmNotification(Context context, String title, String taskId) {
+    private void showAlarmNotification(Context context, String title, String taskId, String message) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        // Setup Intent saat notifikasi diklik (Buka Detail Tugas)
         Intent intent = new Intent(context, DetailTaskActivity.class);
         if (taskId != null) {
             intent.putExtra("EXTRA_TASK_ID", taskId);
@@ -74,18 +64,16 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context,
-                taskId != null ? taskId.hashCode() : 0, // Request code unik
+                taskId != null ? taskId.hashCode() : 0,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
-        // Tentukan Suara Alarm
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         if (alarmSound == null) {
             alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         }
 
-        // Setup Notification Channel (Android 8.0+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             AudioAttributes audioAttributes = new AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_ALARM)
@@ -98,7 +86,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                     NotificationManager.IMPORTANCE_HIGH
             );
 
-            channel.setDescription("Pengingat untuk tugas harian");
+            channel.setDescription("Pengingat untuk Tugas Harian Anda");
             channel.enableVibration(true);
             channel.setVibrationPattern(new long[]{1000, 1000, 1000, 1000, 1000});
             channel.setSound(alarmSound, audioAttributes);
@@ -109,11 +97,16 @@ public class AlarmReceiver extends BroadcastReceiver {
             }
         }
 
-        // Build Notifikasi
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_baseline_notifications_24)
-                .setContentTitle("Waktunya Mengerjakan Tugas! ⏰")
-                .setContentText(title) // Judul Tugas
+
+                .setContentTitle(title)
+
+                .setContentText(message)
+
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+
                 .setColor(ContextCompat.getColor(context, R.color.tm_green))
                 .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000})
                 .setLights(ContextCompat.getColor(context, R.color.tm_green), 3000, 3000)
@@ -124,7 +117,6 @@ public class AlarmReceiver extends BroadcastReceiver {
                 .setAutoCancel(true)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
-        // Tampilkan dengan ID unik (berdasarkan waktu)
         int notificationId = (int) System.currentTimeMillis();
         if (notificationManager != null) {
             notificationManager.notify(notificationId, builder.build());

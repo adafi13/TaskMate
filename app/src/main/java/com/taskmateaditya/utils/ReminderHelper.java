@@ -9,26 +9,57 @@ import android.util.Log;
 
 import com.taskmateaditya.data.Task;
 
+import java.util.Calendar;
+
 public class ReminderHelper {
 
+
+    private static final long MINUTE_IN_MILLIS = 60 * 1000;
+    private static final long HOUR_IN_MILLIS = 60 * MINUTE_IN_MILLIS;
+
     public static void setReminder(Context context, Task task) {
-        // 1. Validasi: Jangan set alarm jika fitur dimatikan atau waktu sudah lewat
-        if (!task.isReminderActive() || task.getReminderTime() <= System.currentTimeMillis()) {
+
+        if (!task.isReminderActive()) {
+            return;
+        }
+
+        long deadlineTime = task.getReminderTime();
+
+        // --- DAFTAR JADWAL NOTIFIKASI ---
+
+        // 1. Notifikasi UTAMA (Pas Waktu Deadline) - ID Offset 0
+        scheduleAlarm(context, task, deadlineTime, "Waktunya mengerjakan tugas! ⏰", 0);
+
+        // 2. Notifikasi 30 MENIT Sebelum - ID Offset 1
+        long time30Min = deadlineTime - (30 * MINUTE_IN_MILLIS);
+        scheduleAlarm(context, task, time30Min, "Sisa waktu 30 menit lagi! Ayo selesaikan 🔥", 1);
+
+        // 3. Notifikasi 2 JAM Sebelum - ID Offset 2
+        long time2Hour = deadlineTime - (2 * HOUR_IN_MILLIS);
+        scheduleAlarm(context, task, time2Hour, "Deadline tinggal 2 jam lagi. Semangat! ⏳", 2);
+
+        // 4. Notifikasi 15 JAM Sebelum - ID Offset 3
+        long time15Hour = deadlineTime - (15 * HOUR_IN_MILLIS);
+        scheduleAlarm(context, task, time15Hour, "Ingat, tugas ini deadline-nya 15 jam lagi 📅", 3);
+    }
+
+    // Method pembantu untuk set alarm (agar kodingan rapi)
+    private static void scheduleAlarm(Context context, Task task, long triggerTime, String message, int idOffset) {
+
+        if (triggerTime <= System.currentTimeMillis()) {
             return;
         }
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
 
-        // --- KIRIM DATA KE ALARM RECEIVER ---
-        // Gunakan string "TASK_TITLE" dan "TASK_ID" agar cocok dengan AlarmReceiver.java
+
         intent.putExtra("TASK_ID", task.getId());
         intent.putExtra("TASK_TITLE", task.getTitle());
-        intent.putExtra("TASK_MESSAGE", "Jangan lupa, tenggat waktu semakin dekat!");
+        intent.putExtra("TASK_MESSAGE", message);
 
-        // Buat ID unik dari hashcode ID Tugas
-        // Ini penting agar notifikasi tugas A tidak menimpa tugas B
-        int uniqueId = task.getId().hashCode();
+
+        int uniqueId = task.getId().hashCode() + idOffset;
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context,
@@ -39,28 +70,20 @@ public class ReminderHelper {
 
         if (alarmManager != null) {
             try {
-                // 2. Set Alarm Sesuai Versi Android
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    // Android 12 ke atas butuh izin SCHEDULE_EXACT_ALARM
                     if (alarmManager.canScheduleExactAlarms()) {
-                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, task.getReminderTime(), pendingIntent);
+                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
                     } else {
-                        // Fallback jika izin tidak diberikan (jarang terjadi jika manifest benar)
-                        alarmManager.set(AlarmManager.RTC_WAKEUP, task.getReminderTime(), pendingIntent);
+                        alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
                     }
                 } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    // Android 6.0 - 11
-                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, task.getReminderTime(), pendingIntent);
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
                 } else {
-                    // Android di bawah 6.0
-                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, task.getReminderTime(), pendingIntent);
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
                 }
-
-                Log.d("ReminderHelper", "Alarm berhasil diset untuk: " + task.getTitle());
-
+                Log.d("ReminderHelper", "Sukses set alarm: " + message + " untuk jam " + triggerTime);
             } catch (SecurityException e) {
                 e.printStackTrace();
-                Log.e("ReminderHelper", "Gagal set alarm: Izin tidak diberikan");
             }
         }
     }
@@ -69,19 +92,22 @@ public class ReminderHelper {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
 
-        // Gunakan ID yang sama persis untuk membatalkan
-        int uniqueId = task.getId().hashCode();
+        int[] offsets = {0, 1, 2, 3};
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                context,
-                uniqueId,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
+        for (int offset : offsets) {
+            int uniqueId = task.getId().hashCode() + offset;
 
-        if (alarmManager != null) {
-            alarmManager.cancel(pendingIntent);
-            Log.d("ReminderHelper", "Alarm dibatalkan untuk: " + task.getTitle());
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                    context,
+                    uniqueId,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+            );
+
+            if (alarmManager != null) {
+                alarmManager.cancel(pendingIntent);
+            }
         }
+        Log.d("ReminderHelper", "Semua jadwal alarm dibatalkan untuk: " + task.getTitle());
     }
 }
