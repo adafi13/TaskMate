@@ -11,12 +11,16 @@ public class NotificationLog {
     public String title;
     public String message;
     public long timestamp;
-    public int type; // 0 = Info, 1 = Alert/Urgent
+    public int type;
 
-    public NotificationLog(String title, String message, long timestamp, int type) {
+    public String taskId;
+
+
+    public NotificationLog(String title, String message, long timestamp, int type, String taskId) {
         this.title = title;
         this.message = message;
         this.timestamp = timestamp;
         this.type = type;
+        this.taskId = taskId;
     }
 }

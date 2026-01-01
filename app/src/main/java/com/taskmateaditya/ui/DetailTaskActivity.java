@@ -339,7 +339,7 @@ public class DetailTaskActivity extends AppCompatActivity {
         if (isReminderActive) ReminderHelper.setReminder(this, taskToSave);
         else ReminderHelper.cancelReminder(this, taskToSave);
 
-        String msg = isReminderActive ? "Tugas disimpan dengan Pengingat Bertahap!" : "Tugas disimpan!";
+        String msg = isReminderActive ? "Tugas berhasil disimpan dengan pengingat bertahap." : "Tugas disimpan!";
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         finish();
     }

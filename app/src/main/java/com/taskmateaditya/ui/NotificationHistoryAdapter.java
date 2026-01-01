@@ -16,6 +16,16 @@ public class NotificationHistoryAdapter extends RecyclerView.Adapter<Notificatio
 
     private List<NotificationLog> logs = new ArrayList<>();
 
+    private OnItemClickListener listener;
+
+    public interface OnItemClickListener {
+        void onItemClick(NotificationLog log);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
     public void setLogs(List<NotificationLog> logs) {
         this.logs = logs;
         notifyDataSetChanged();
@@ -34,13 +44,18 @@ public class NotificationHistoryAdapter extends RecyclerView.Adapter<Notificatio
         holder.tvTitle.setText(log.title);
         holder.tvMessage.setText(log.message);
 
-        // Format waktu cerdas (misal: "5 minutes ago")
         CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
                 log.timestamp,
                 System.currentTimeMillis(),
                 DateUtils.MINUTE_IN_MILLIS
         );
         holder.tvTime.setText(timeAgo);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(log);
+            }
+        });
     }
 
     @Override

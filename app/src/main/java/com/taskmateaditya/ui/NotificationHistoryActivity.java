@@ -1,5 +1,6 @@
 package com.taskmateaditya.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,14 +33,11 @@ public class NotificationHistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification_history);
 
-        // 1. Setup Toolbar
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar); // Mengaktifkan Toolbar sebagai ActionBar
+        setSupportActionBar(toolbar);
 
-        // Tombol Back (Panah Kiri)
         toolbar.setNavigationOnClickListener(v -> finish());
 
-        // 2. Setup RecyclerView
         recyclerView = findViewById(R.id.rvNotifications);
         emptyState = findViewById(R.id.emptyStateLayout);
 
@@ -47,12 +45,22 @@ public class NotificationHistoryActivity extends AppCompatActivity {
         adapter = new NotificationHistoryAdapter();
         recyclerView.setAdapter(adapter);
 
-        // 3. Load Data Live dari Database
+        adapter.setOnItemClickListener(log -> {
+
+            if (log.taskId != null && !log.taskId.isEmpty()) {
+                Intent intent = new Intent(NotificationHistoryActivity.this, DetailTaskActivity.class);
+                intent.putExtra("EXTRA_TASK_ID", log.taskId);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Tugas terkait tidak ditemukan", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
         LiveData<List<NotificationLog>> liveData = TaskDatabase.getDatabase(this).notificationDao().getAllNotifications();
         liveData.observe(this, logs -> {
             adapter.setLogs(logs);
 
-            // Tampilkan Empty State jika kosong
             if (logs.isEmpty()) {
                 emptyState.setVisibility(View.VISIBLE);
                 recyclerView.setVisibility(View.GONE);
@@ -63,14 +71,12 @@ public class NotificationHistoryActivity extends AppCompatActivity {
         });
     }
 
-    // 🔥 WAJIB DITAMBAHKAN: Agar Menu "Hapus Semua" Muncul 🔥
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_notification_history, menu);
         return true;
     }
 
-    // 🔥 WAJIB DITAMBAHKAN: Menangani Klik Menu 🔥
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_clear_all) {
@@ -81,7 +87,7 @@ public class NotificationHistoryActivity extends AppCompatActivity {
     }
 
     private void showClearConfirmation() {
-        // Cek dulu apakah ada data, kalau kosong jangan tampilkan dialog
+
         if (adapter.getItemCount() == 0) {
             Toast.makeText(this, "Riwayat sudah kosong", Toast.LENGTH_SHORT).show();
             return;
@@ -91,7 +97,7 @@ public class NotificationHistoryActivity extends AppCompatActivity {
                 .setTitle("Hapus Semua?")
                 .setMessage("Apakah Anda yakin ingin menghapus seluruh riwayat notifikasi? Tindakan ini tidak dapat dibatalkan.")
                 .setPositiveButton("Hapus", (dialog, which) -> {
-                    // Hapus data di Background Thread
+
                     TaskDatabase.getDatabase(this).databaseWriteExecutor.execute(() -> {
                         TaskDatabase.getDatabase(this).notificationDao().clearAll();
                     });

@@ -21,13 +21,11 @@ import com.taskmateaditya.ui.DetailTaskActivity;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
-    // ID Channel
     private static final String CHANNEL_ID = "task_channel_v2";
     private static final String CHANNEL_NAME = "Task Reminder";
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // 1. Ambil data dari Intent
         String taskTitle = intent.getStringExtra("TASK_TITLE");
         String taskId = intent.getStringExtra("TASK_ID");
         String taskMessage = intent.getStringExtra("TASK_MESSAGE");
@@ -37,17 +35,19 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             showAlarmNotification(context, taskTitle, taskId, finalMessage);
 
-            saveNotificationToHistory(context, taskTitle, finalMessage);
+            saveNotificationToHistory(context, taskTitle, finalMessage, taskId);
         }
     }
 
-    private void saveNotificationToHistory(Context context, String title, String message) {
+    private void saveNotificationToHistory(Context context, String title, String message, String taskId) {
         TaskDatabase.getDatabase(context).databaseWriteExecutor.execute(() -> {
+
             NotificationLog log = new NotificationLog(
                     title,
                     message,
                     System.currentTimeMillis(),
-                    1
+                    1,
+                    taskId // <--- Tambahkan ini
             );
             TaskDatabase.getDatabase(context).notificationDao().insert(log);
         });
@@ -97,16 +97,11 @@ public class AlarmReceiver extends BroadcastReceiver {
             }
         }
 
-
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_baseline_notifications_24)
-
                 .setContentTitle(title)
-
                 .setContentText(message)
-
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
-
                 .setColor(ContextCompat.getColor(context, R.color.tm_green))
                 .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000})
                 .setLights(ContextCompat.getColor(context, R.color.tm_green), 3000, 3000)
