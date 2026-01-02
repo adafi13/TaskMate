@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TaskMate Aditya</string>
+    <string name="app_name">TaskMate</string>
 
     <string name="tagline">TaskMate Aplikasi pencatat tugas\nKelola deadline dan belajar lebih tenang</string>
     <string name="get_started">Get Started</string>
