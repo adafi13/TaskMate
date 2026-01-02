@@ -12,7 +12,10 @@
     <color name="tm_divider">#333333</color>
     <color name="tm_red_error">#EF4444</color>
 
-    <color name="black">#FFFFFF</color> <color name="white">#121212</color> <color name="custom_black">#E0E0E0</color> <color name="priority_high">#FF8A80</color>
+    <color name="black">#FFFFFF</color>
+    <color name="white">#121212</color>
+    <color name="custom_black">#E0E0E0</color>
+    <color name="priority_high">#FF8A80</color>
     <color name="priority_medium">#FFE57F</color>
     <color name="priority_low">#69F0AE</color>
     <color name="tm_green_chip_selector">#00C853</color>
@@ -20,4 +23,14 @@
     <color name="dark_surface">#1E1E1E</color>
     <color name="dark_background">#121212</color>
 
-    <color name="chat_background">#121212</color>       <color name="chat_input_background">#1E1E1E</color> <color name="chat_bubble_ai">#2C2C2C</color>        <color name="chat_bubble_user">#007E33</color>      <color name="chat_text_primary">#EEEEEE</color>     <color name="chat_text_secondary">#BDBDBD</color>   <color name="chat_text_on_primary">#FFFFFF</color>  </resources>
+    <color name="chat_background">#121212</color>
+
+    <color name="chat_input_bg">#1E1E1E</color>
+    <color name="chat_input_background">#1E1E1E</color> <color name="chat_avatar_bg">#2E3B32</color>
+
+    <color name="chat_bubble_ai">#2C2C2C</color>
+    <color name="chat_bubble_user">#007E33</color>
+    <color name="chat_text_primary">#EEEEEE</color>
+    <color name="chat_text_secondary">#BDBDBD</color>
+    <color name="chat_text_on_primary">#FFFFFF</color>
+</resources>

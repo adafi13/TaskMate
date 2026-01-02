@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="tm_green">#00C853</color> <color name="tm_green_dark">#009624</color>
+    <color name="tm_green">#00C853</color>
+    <color name="tm_green_dark">#009624</color>
     <color name="tm_background">#FFFFFF</color>
     <color name="tm_card_background">#FFFFFF</color>
 
@@ -22,4 +23,16 @@
     <color name="dark_surface">#1E1E1E</color>
     <color name="dark_background">#121212</color>
 
-    <color name="chat_background">#F5F5F5</color>       <color name="chat_input_background">#FFFFFF</color> <color name="chat_bubble_ai">#FFFFFF</color>        <color name="chat_bubble_user">#00C853</color>      <color name="chat_text_primary">#212121</color>     <color name="chat_text_secondary">#757575</color>   <color name="chat_text_on_primary">#FFFFFF</color>  </resources>
+    <color name="chat_background">#F5F5F5</color>
+
+    <color name="chat_input_bg">#FFFFFF</color>
+    <color name="chat_input_background">#FFFFFF</color>
+
+    <color name="chat_avatar_bg">#E8F5E9</color>
+
+    <color name="chat_bubble_ai">#FFFFFF</color>
+    <color name="chat_bubble_user">#00C853</color>
+    <color name="chat_text_primary">#212121</color>
+    <color name="chat_text_secondary">#757575</color>
+    <color name="chat_text_on_primary">#FFFFFF</color>
+</resources>
