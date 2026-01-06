@@ -37,7 +37,7 @@ import okhttp3.Response;
 public class AiChatActivity extends AppCompatActivity {
 
     // API Key & Config
-    private static final String GROQ_API_KEY = "";
+    private static final String GROQ_API_KEY = "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";
     private static final String GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
     private static final String GROQ_MODEL = "llama-3.1-8b-instant";
 
