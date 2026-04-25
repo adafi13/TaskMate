@@ -24,9 +24,6 @@ TaskMate adalah aplikasi Android modern yang dirancang untuk membantu pengguna m
 
 ## 📸 Showcase UI
 
-> [!NOTE]
-> Silakan tambahkan file gambar ke folder `screenshots/` di repository ini untuk menampilkan gambar di bawah.
-
 | Splash Screen | Welcome | Login |
 | :---: | :---: | :---: |
 | ![Splash](screenshots/splash.png) | ![Welcome](screenshots/welcome.png) | ![Login](screenshots/login.png) |
