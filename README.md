@@ -27,13 +27,21 @@ TaskMate adalah aplikasi Android modern yang dirancang untuk membantu pengguna m
 > [!NOTE]
 > Silakan tambahkan file gambar ke folder `screenshots/` di repository ini untuk menampilkan gambar di bawah.
 
-| Home Screen | Smart Add Task | AI Chat Assistant |
+| Splash Screen | Welcome | Login |
 | :---: | :---: | :---: |
-| ![Home](screenshots/home.png) | ![Add Task](screenshots/add_task.png) | ![AI Chat](screenshots/ai_chat.png) |
+| ![Splash](screenshots/splash.png) | ![Welcome](screenshots/welcome.png) | ![Login](screenshots/login.png) |
 
-| Settings & Profile | Focus Timer | Task Detail |
+| Google Auth | Home Screen | Speed Dial |
 | :---: | :---: | :---: |
-| ![Settings](screenshots/settings.png) | ![Timer](screenshots/timer.png) | ![Detail](screenshots/detail.png) |
+| ![Google Auth](screenshots/google_auth.png) | ![Home](screenshots/home.png) | ![Speed Dial](screenshots/speed_dial.png) |
+
+| Detail (Atas) | Detail (AI) | AI Chat Assistant |
+| :---: | :---: | :---: |
+| ![Detail Top](screenshots/detail_top.png) | ![Detail AI](screenshots/detail_ai.png) | ![AI Chat](screenshots/ai_chat.png) |
+
+| Profile & Stats | Settings & Version | Analytics Dashboard |
+| :---: | :---: | :---: |
+| ![Profile](screenshots/profile.png) | ![Settings](screenshots/settings.png) | ![Dashboard](screenshots/dashboard.png) |
 
 ---
 
