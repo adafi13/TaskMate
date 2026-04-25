@@ -15,6 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.taskmateaditya.R;
 import com.taskmateaditya.data.Task;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -93,6 +96,34 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         // 4. Set Kategori
         holder.textViewCategory.setText(currentTask.getCategory() != null ? currentTask.getCategory() : "Umum");
 
+        // 4.5 Evaluasi Sub-Tugas (Checklist Progress)
+        int totalSubtasks = 0;
+        int completedSubtasks = 0;
+        try {
+            JSONArray arr = new JSONArray(currentTask.getSubtasksJson());
+            totalSubtasks = arr.length();
+            for (int i = 0; i < totalSubtasks; i++) {
+                JSONObject obj = arr.getJSONObject(i);
+                if (obj.optBoolean("isCompleted", false)) {
+                    completedSubtasks++;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (totalSubtasks > 0) {
+            holder.textViewSubtaskProgress.setVisibility(View.VISIBLE);
+            holder.textViewSubtaskProgress.setText("🔗 " + completedSubtasks + "/" + totalSubtasks + " Langkah");
+            if (completedSubtasks == totalSubtasks) {
+                holder.textViewSubtaskProgress.setTextColor(Color.parseColor("#00C853"));
+            } else {
+                holder.textViewSubtaskProgress.setTextColor(Color.parseColor("#777777"));
+            }
+        } else {
+            holder.textViewSubtaskProgress.setVisibility(View.GONE);
+        }
+
         // 5. Visual State: Selesai vs Belum (Efek Coret & Pudar)
         holder.checkBoxCompleted.setOnCheckedChangeListener(null);
         holder.checkBoxCompleted.setChecked(currentTask.isCompleted());
@@ -131,7 +162,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     }
 
     static class TaskViewHolder extends RecyclerView.ViewHolder {
-        final TextView textViewTitle, textViewDeadline, textViewPriority, textViewCategory;
+        final TextView textViewTitle, textViewDeadline, textViewPriority, textViewCategory, textViewSubtaskProgress;
         final CheckBox checkBoxCompleted;
         final View priorityIndicator;
         final ImageButton btnDeleteTask;
@@ -142,6 +173,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             textViewDeadline = itemView.findViewById(R.id.textViewDeadline);
             textViewPriority = itemView.findViewById(R.id.textViewPriority);
             textViewCategory = itemView.findViewById(R.id.textViewCategory);
+            textViewSubtaskProgress = itemView.findViewById(R.id.textViewSubtaskProgress);
             checkBoxCompleted = itemView.findViewById(R.id.checkBoxCompleted);
             priorityIndicator = itemView.findViewById(R.id.priorityIndicator);
             btnDeleteTask = itemView.findViewById(R.id.btnDeleteTask);

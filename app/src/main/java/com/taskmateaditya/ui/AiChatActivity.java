@@ -17,13 +17,19 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.chip.Chip;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.taskmateaditya.R;
 import com.taskmateaditya.data.ChatMessage;
+import com.taskmateaditya.data.Task;
+import com.taskmateaditya.data.TaskDatabase;
+import com.taskmateaditya.BuildConfig;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -36,76 +42,78 @@ import okhttp3.Response;
 
 public class AiChatActivity extends AppCompatActivity {
 
-    // API Key & Config
-    private static final String GROQ_API_KEY = "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";
+    public static final String EXTRA_DOC_TEXT = "EXTRA_DOC_TEXT";
+
+    private static final String GROQ_API_KEY = BuildConfig.GROQ_API_KEY;
     private static final String GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
     private static final String GROQ_MODEL = "llama-3.1-8b-instant";
 
-    // Views
     private RecyclerView rvChat;
     private EditText etInput;
     private ImageButton btnSend, btnBack;
     private ProgressBar progressBar;
 
-    // View Tambahan untuk Tampilan Baru
     private LinearLayout layoutWelcome;
     private Chip chipIdea, chipSchedule, chipSummary;
 
     private ChatAdapter adapter;
     private OkHttpClient client;
+    private String docContextText = null;
+
+    private TaskDatabase taskDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ai_chat);
 
-        // 1. Inisialisasi Views
         initViews();
 
-        // 2. Setup RecyclerView
         adapter = new ChatAdapter();
         rvChat.setLayoutManager(new LinearLayoutManager(this));
         rvChat.setAdapter(adapter);
 
-        // 3. Cek Status Kosong (Tampilkan Robot jika belum ada chat)
         checkEmptyState();
 
-        // 4. Setup Tombol Kembali
         btnBack.setOnClickListener(v -> finish());
 
-        // 5. Setup Network Client
-        client = new OkHttpClient.Builder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .build();
+        client = com.taskmateaditya.TaskMateApplication.getInstance().getHttpClient();
 
-        // 6. Setup Listener Tombol Kirim (Manual)
+        taskDatabase = TaskDatabase.getDatabase(this);
+
         btnSend.setOnClickListener(v -> {
             String text = etInput.getText().toString().trim();
             sendMessage(text);
         });
 
-        // 7. Setup Logic Chips (Saran Cepat)
         setupChipListeners();
 
-        // 8. Setup TextWatcher (Hilangkan Robot saat mulai mengetik)
         etInput.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() > 0) {
                     layoutWelcome.setVisibility(View.GONE);
                 } else if (adapter.getItemCount() == 0) {
-                    // Jika teks dihapus habis dan belum ada chat, munculkan lagi
                     layoutWelcome.setVisibility(View.VISIBLE);
                 }
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
+
+        // Handle Document context if passed
+        if (getIntent().hasExtra(EXTRA_DOC_TEXT)) {
+            docContextText = getIntent().getStringExtra(EXTRA_DOC_TEXT);
+            layoutWelcome.setVisibility(View.GONE);
+            rvChat.setVisibility(View.VISIBLE);
+            adapter.addMessage(new ChatMessage("Sken berhasil! Saya sudah membaca dokumen Anda. Apa yang ingin Anda tanyakan atau ringkas?", false));
+        }
     }
 
     private void initViews() {
@@ -115,7 +123,6 @@ public class AiChatActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.btnBack);
         progressBar = findViewById(R.id.progressBar);
 
-        // View Baru
         layoutWelcome = findViewById(R.id.layoutWelcome);
         chipIdea = findViewById(R.id.chipIdea);
         chipSchedule = findViewById(R.id.chipSchedule);
@@ -123,21 +130,18 @@ public class AiChatActivity extends AppCompatActivity {
     }
 
     private void setupChipListeners() {
-        // 🚀 MODIFIKASI: Mengirim teks pendek "Ide Tugas" saja
         chipIdea.setOnClickListener(v -> {
             sendMessage("Ide Tugas");
         });
 
-        // 🚀 MODIFIKASI: Mengirim teks pendek "Buat Jadwal" saja
         chipSchedule.setOnClickListener(v -> {
             sendMessage("Buat Jadwal");
         });
 
-        // "Ringkas Teks" tetap masuk input karena user perlu paste teks
         chipSummary.setOnClickListener(v -> {
             etInput.setText("Tolong ringkas teks berikut ini:\n\n");
             etInput.setSelection(etInput.getText().length());
-            etInput.requestFocus(); // Fokus agar user siap paste
+            etInput.requestFocus();
             layoutWelcome.setVisibility(View.GONE);
         });
     }
@@ -152,29 +156,70 @@ public class AiChatActivity extends AppCompatActivity {
         }
     }
 
-    // Method sendMessage menerima parameter String agar bisa dipanggil dari Chip
     private void sendMessage(String query) {
-        if (query.isEmpty()) return;
+        if (query.isEmpty())
+            return;
 
-        // Update UI: Sembunyikan Robot, Tampilkan Chat
         layoutWelcome.setVisibility(View.GONE);
         rvChat.setVisibility(View.VISIBLE);
 
-        // Tampilkan pesan user ke layar
         adapter.addMessage(new ChatMessage(query, true));
 
-        // Bersihkan kolom input (Penting jika dikirim via tombol manual)
         etInput.setText("");
         scrollToBottom();
 
-        // Tampilkan loading
         progressBar.setVisibility(View.VISIBLE);
 
-        // Panggil API Groq
-        callGroqApi(query);
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        final String userId = (currentUser != null) ? currentUser.getUid() : null;
+
+        TaskDatabase.databaseWriteExecutor.execute(() -> {
+
+            List<Task> pendingTasks = null;
+            if (userId != null) {
+                try {
+                    pendingTasks = taskDatabase.taskDao().getPendingTasksForUser(userId);
+                } catch (Exception e) {
+                    Log.e("AiChat", "Failed to fetch tasks from Room", e);
+                }
+            }
+
+            final String taskSummary = buildTaskSummary(pendingTasks);
+
+            runOnUiThread(() -> callGroqApi(query, taskSummary));
+        });
     }
 
-    private void callGroqApi(String query) {
+    private String buildTaskSummary(List<Task> tasks) {
+        if (tasks == null || tasks.isEmpty()) {
+            return "No pending tasks.";
+        }
+
+        StringBuilder sb = new StringBuilder("Current Tasks: ");
+        for (int i = 0; i < tasks.size(); i++) {
+            Task task = tasks.get(i);
+
+            String title = task.getTitle() != null ? task.getTitle() : "Untitled";
+            String priority = task.getPriority() != null ? task.getPriority() : "No priority";
+            String deadline = (task.getDeadline() != null && !task.getDeadline().isEmpty())
+                    ? "Due " + task.getDeadline()
+                    : "No due date";
+
+            sb.append(title)
+                    .append(" (")
+                    .append(priority)
+                    .append(", ")
+                    .append(deadline)
+                    .append(")");
+
+            if (i < tasks.size() - 1) {
+                sb.append(", ");
+            }
+        }
+        return sb.toString();
+    }
+
+    private void callGroqApi(String query, String taskSummary) {
         JSONObject jsonBody = new JSONObject();
         try {
             jsonBody.put("model", GROQ_MODEL);
@@ -182,8 +227,15 @@ public class AiChatActivity extends AppCompatActivity {
 
             JSONObject sysMsg = new JSONObject();
             sysMsg.put("role", "system");
-            // System Prompt diperbarui agar AI mengerti perintah singkat "Ide Tugas"
-            sysMsg.put("content", "Kamu adalah TaskMate AI. Jika user mengirim 'Ide Tugas', berikan 3-5 ide tugas kreatif untuk mahasiswa IT. Jika user mengirim 'Buat Jadwal', berikan contoh template jadwal belajar harian. Jawablah dengan ramah, singkat, dan gunakan emoji.");
+            
+            String promptContext = "You are TaskMate AI. You have access to the user's current tasks: " + taskSummary + ". ";
+            if (docContextText != null && !docContextText.isEmpty()) {
+                promptContext += "The user also scanned a document with this text: \"" + docContextText + "\". " +
+                                 "Prioritize answering based strictly on the document content if the user asks about it. ";
+            }
+            promptContext += "Answer strictly based on provided data. Keep it short and conversational.";
+            
+            sysMsg.put("content", promptContext);
             messages.put(sysMsg);
 
             JSONObject userMsg = new JSONObject();
@@ -226,7 +278,8 @@ public class AiChatActivity extends AppCompatActivity {
                                     .getJSONObject(0).getJSONObject("message").getString("content");
                             adapter.addMessage(new ChatMessage(text.trim(), false));
                         } catch (Exception e) {
-                            adapter.addMessage(new ChatMessage("Maaf, terjadi kesalahan saat memproses jawaban.", false));
+                            adapter.addMessage(
+                                    new ChatMessage("Maaf, terjadi kesalahan saat memproses jawaban.", false));
                         }
                     } else {
                         adapter.addMessage(new ChatMessage("Server Error: " + response.code(), false));

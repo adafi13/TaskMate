@@ -24,50 +24,44 @@ public interface TaskDao {
     @Delete
     void delete(Task task);
 
-    // 1. Ambil Semua Tugas (User ID)
-    // Saat ini sorting berdasarkan ID (UUID) yang acak.
-    // Jika ingin benar-benar urut waktu, nanti perlu tambah field 'createdAt' di Task.java.
-    @Query("SELECT * FROM task_table WHERE userId = :userId ORDER BY id DESC")
+    @Query("SELECT * FROM task_table WHERE userId = :userId ORDER BY createdAt DESC")
     LiveData<List<Task>> getAllTasks(String userId);
 
-    // 2. Pencarian
     @Query("SELECT * FROM task_table WHERE userId = :userId AND (title LIKE '%' || :query || '%' OR mataKuliah LIKE '%' || :query || '%') ORDER BY deadline ASC")
     LiveData<List<Task>> searchTasks(String query, String userId);
 
-    // 3. Sortir Deadline
     @Query("SELECT * FROM task_table WHERE userId = :userId ORDER BY deadline ASC")
     LiveData<List<Task>> getTasksSortedByDeadline(String userId);
 
-    // 4. Sortir Prioritas
     @Query("SELECT * FROM task_table WHERE userId = :userId ORDER BY CASE priority WHEN 'Tinggi' THEN 1 WHEN 'Sedang' THEN 2 WHEN 'Rendah' THEN 3 ELSE 4 END ASC")
     LiveData<List<Task>> getTasksSortedByPriority(String userId);
 
-    // 5. Filter Kategori
     @Query("SELECT * FROM task_table WHERE userId = :userId AND category = :category ORDER BY deadline ASC")
     LiveData<List<Task>> getTasksByCategory(String category, String userId);
 
-    // 6. Ambil Satu Tugas by ID (Parameter String untuk UUID)
     @Query("SELECT * FROM task_table WHERE id = :taskId")
     LiveData<Task> getTaskById(String taskId);
 
-    // 7. Ambil Semua Tanpa User (Untuk Debugging/Admin jika perlu)
     @Query("SELECT * FROM task_table ORDER BY deadline ASC")
     LiveData<List<Task>> getAllTasksNoUser();
 
     @Query("SELECT * FROM task_table WHERE isCompleted = 0 ORDER BY deadline ASC")
     List<Task> getActiveTasksForWidget();
 
-    // Hitung total tugas user ini
     @Query("SELECT COUNT(*) FROM task_table WHERE userId = :userId")
     int getTotalTasksCount(String userId);
 
-    // Hitung tugas yang SUDAH selesai
     @Query("SELECT COUNT(*) FROM task_table WHERE userId = :userId AND isCompleted = 1")
     int getCompletedTasksCount(String userId);
 
-    // Tambahkan baris ini di TaskDao.java
     @Query("SELECT * FROM task_table")
     List<Task> getAllTasksForWidget();
 
+    @Query("SELECT * FROM task_table WHERE userId = :userId AND deadline = :date AND isCompleted = 0")
+    List<Task> getTasksForDateSync(String userId, String date);
+
+    // RAG: Synchronous query for all pending (not completed) tasks — called from background thread
+    @Query("SELECT * FROM task_table WHERE userId = :userId AND isCompleted = 0 ORDER BY deadline ASC")
+    List<Task> getPendingTasksForUser(String userId);
 
 }

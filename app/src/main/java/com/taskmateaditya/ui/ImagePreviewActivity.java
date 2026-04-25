@@ -7,6 +7,9 @@ import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.taskmateaditya.R;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
 public class ImagePreviewActivity extends AppCompatActivity {
 
     @Override
@@ -20,7 +23,10 @@ public class ImagePreviewActivity extends AppCompatActivity {
         // Ambil data URI dari Intent
         String uriString = getIntent().getStringExtra("IMAGE_URI");
         if (uriString != null) {
-            imgFull.setImageURI(Uri.parse(uriString));
+            Glide.with(this)
+                 .load(Uri.parse(uriString))
+                 .diskCacheStrategy(DiskCacheStrategy.ALL)
+                 .into(imgFull);
         }
 
         // Klik tombol kembali untuk menutup preview

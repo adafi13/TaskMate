@@ -7,8 +7,11 @@ import androidx.room.RoomDatabase;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-// 🔥 UPDATE: Tambahkan NotificationLog.class dan naikkan versi ke 6
-@Database(entities = {Task.class, NotificationLog.class}, version = 6, exportSchema = false)
+import androidx.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
+
+// 🔥 UPDATE: Naikkan versi ke 9 (tambah subtasksJson)
+@Database(entities = {Task.class, NotificationLog.class}, version = 9, exportSchema = false)
 public abstract class TaskDatabase extends RoomDatabase {
 
     public abstract TaskDao taskDao();
@@ -22,13 +25,21 @@ public abstract class TaskDatabase extends RoomDatabase {
     public static final ExecutorService databaseWriteExecutor =
             Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
+    static final Migration MIGRATION_8_9 = new Migration(8, 9) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE task_table ADD COLUMN subtasksJson TEXT DEFAULT '[]'");
+        }
+    };
+
     public static TaskDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {
             synchronized (TaskDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                                     TaskDatabase.class, "task_database")
-                            .fallbackToDestructiveMigration() // Penting: Hapus data lama saat versi naik
+                            .addMigrations(MIGRATION_8_9) // Migrasi aman
+                            .fallbackToDestructiveMigration() // Penting: Hapus data lama saat versi naik selain 8 ke 9
                             .setJournalMode(JournalMode.TRUNCATE) // Stabilisasi database
                             .build();
                 }

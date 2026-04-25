@@ -11,8 +11,11 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
+        android:name=".TaskMateApplication"
         android:allowBackup="true"
         android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher"
@@ -46,6 +49,11 @@
             android:name=".ui.SettingsActivity"
             android:exported="false"
             android:label="Pengaturan" />
+
+        <activity
+            android:name=".ui.DashboardActivity"
+            android:exported="false"
+            android:label="Dashboard" />
 
         <activity
             android:name=".ui.ImagePreviewActivity"
@@ -97,6 +105,12 @@
         <activity
             android:name=".ui.NotificationHistoryActivity"
             android:label="Riwayat Notifikasi"
+            android:theme="@style/Theme.Material3.DayNight.NoActionBar"
+            android:exported="false"/>
+
+        <activity
+            android:name=".ui.FocusTimerActivity"
+            android:label="Focus Timer"
             android:theme="@style/Theme.Material3.DayNight.NoActionBar"
             android:exported="false"/>
 

@@ -114,8 +114,7 @@ public class SettingsActivity extends AppCompatActivity {
                         checkDrivePermissionAndUpload(imageUri);
                     }
                 }
-            }
-    );
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,7 +126,9 @@ public class SettingsActivity extends AppCompatActivity {
 
         try {
             taskViewModel = new ViewModelProvider(this).get(TaskViewModel.class);
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -166,7 +167,8 @@ public class SettingsActivity extends AppCompatActivity {
             GoogleSignIn.requestPermissions(this, 9002, account, driveScope);
             saveLocalOnly(imageUri);
         } else {
-            if (mDriveServiceHelper == null) updateDriveServiceHelper();
+            if (mDriveServiceHelper == null)
+                updateDriveServiceHelper();
             uploadProfileImageToDrive(imageUri);
         }
     }
@@ -224,7 +226,8 @@ public class SettingsActivity extends AppCompatActivity {
                                         loadDriveImage(photoUrl);
                                     } else {
                                         updateDriveServiceHelper();
-                                        if (mDriveServiceHelper != null) loadDriveImage(photoUrl);
+                                        if (mDriveServiceHelper != null)
+                                            loadDriveImage(photoUrl);
                                     }
                                 } else {
                                     previewUri = Uri.parse(photoUrl);
@@ -246,14 +249,16 @@ public class SettingsActivity extends AppCompatActivity {
 
         mDriveServiceHelper.readFile(fileId)
                 .addOnSuccessListener(pair -> {
-                    if (isFinishing() || isDestroyed()) return;
+                    if (isFinishing() || isDestroyed())
+                        return;
                     progressBarProfile.setVisibility(View.GONE);
                     byte[] imageBytes = pair.second;
                     currentImageModel = imageBytes;
                     loadProfileImageWithGlide(imageBytes);
                 })
                 .addOnFailureListener(e -> {
-                    if (isFinishing() || isDestroyed()) return;
+                    if (isFinishing() || isDestroyed())
+                        return;
                     progressBarProfile.setVisibility(View.GONE);
                     Log.e("DriveLoad", "Error: " + e.getMessage());
                     loadLocalFallback();
@@ -286,9 +291,11 @@ public class SettingsActivity extends AppCompatActivity {
                                 updateFirestoreProfile(user.getUid(), null, driveUriString);
 
                                 runOnUiThread(() -> {
-                                    if (isFinishing() || isDestroyed()) return;
+                                    if (isFinishing() || isDestroyed())
+                                        return;
                                     progressBarProfile.setVisibility(View.GONE);
-                                    Toast.makeText(SettingsActivity.this, getString(R.string.msg_sync_success), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(SettingsActivity.this, getString(R.string.msg_sync_success),
+                                            Toast.LENGTH_SHORT).show();
                                     sharedPreferences.edit().remove(KEY_PROFILE_URI).apply();
                                 });
                             }
@@ -301,9 +308,12 @@ public class SettingsActivity extends AppCompatActivity {
                     if (!isFinishing() && !isDestroyed()) {
                         progressBarProfile.setVisibility(View.GONE);
                         if (e.getMessage() != null && e.getMessage().contains("403")) {
-                            Toast.makeText(SettingsActivity.this, "Gagal: Email ini belum terdaftar di Test Users Google Console.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(SettingsActivity.this,
+                                    "Gagal: Email ini belum terdaftar di Test Users Google Console.", Toast.LENGTH_LONG)
+                                    .show();
                         } else {
-                            Toast.makeText(SettingsActivity.this, "Gagal upload ke Drive, menyimpan lokal.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SettingsActivity.this, "Gagal upload ke Drive, menyimpan lokal.",
+                                    Toast.LENGTH_SHORT).show();
                         }
                         saveLocalOnly(uri);
                     }
@@ -343,12 +353,13 @@ public class SettingsActivity extends AppCompatActivity {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             tvAppVersion.setText(getString(R.string.app_version_prefix) + " " + pInfo.versionName);
         } catch (PackageManager.NameNotFoundException e) {
-            tvAppVersion.setText(getString(R.string.app_version_prefix) + " 1.0");
+            tvAppVersion.setText(getString(R.string.app_version_prefix) + " 2.0");
         }
     }
 
     private void loadProfileImageWithGlide(Object model) {
-        if (isFinishing() || isDestroyed()) return;
+        if (isFinishing() || isDestroyed())
+            return;
         currentImageModel = model;
         Glide.with(this)
                 .load(model)
@@ -367,7 +378,8 @@ public class SettingsActivity extends AppCompatActivity {
             previewUri = uri;
             loadProfileImageWithGlide(uri);
             Toast.makeText(this, getString(R.string.msg_saved_local), Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
     }
 
     private void loadLocalFallback() {
@@ -387,8 +399,10 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void updateFirestoreProfile(String uid, String name, String photoUrl) {
         Map<String, Object> updates = new HashMap<>();
-        if (name != null) updates.put("name", name);
-        if (photoUrl != null) updates.put("photoUrl", photoUrl);
+        if (name != null)
+            updates.put("name", name);
+        if (photoUrl != null)
+            updates.put("photoUrl", photoUrl);
 
         db.collection("users").document(uid)
                 .update(updates)
@@ -399,7 +413,8 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void showEditNameDialog() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) return;
+        if (user == null)
+            return;
 
         final EditText input = new EditText(this);
         input.setSingleLine(true);
@@ -460,7 +475,8 @@ public class SettingsActivity extends AppCompatActivity {
                 if (profile.getProviderId().equals("google.com")) {
                     new AlertDialog.Builder(this)
                             .setTitle("Akun Google")
-                            .setMessage("Anda login menggunakan Google. Silakan ubah password melalui pengaturan akun Google Anda.")
+                            .setMessage(
+                                    "Anda login menggunakan Google. Silakan ubah password melalui pengaturan akun Google Anda.")
                             .setPositiveButton("OK", null)
                             .show();
                     return;
@@ -479,7 +495,8 @@ public class SettingsActivity extends AppCompatActivity {
                                         showSpamWarningDialog(user.getEmail());
                                     } else {
                                         Toast.makeText(this, "Gagal mengirim email: " +
-                                                        (task.getException() != null ? task.getException().getMessage() : "Error"),
+                                                (task.getException() != null ? task.getException().getMessage()
+                                                        : "Error"),
                                                 Toast.LENGTH_SHORT).show();
                                     }
                                 });
@@ -501,7 +518,8 @@ public class SettingsActivity extends AppCompatActivity {
     private void showDeleteAccountDialog() {
         new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.dialog_title_delete_account))
-                .setMessage("PERINGATAN: Tindakan ini permanen. Semua data tugas dan profil akan hilang selamanya.\n\nYakin ingin menghapus?")
+                .setMessage(
+                        "PERINGATAN: Tindakan ini permanen. Semua data tugas dan profil akan hilang selamanya.\n\nYakin ingin menghapus?")
                 .setPositiveButton(getString(R.string.btn_delete_confirm), (dialog, which) -> {
                     deleteAccountPermanently();
                 })
@@ -512,7 +530,8 @@ public class SettingsActivity extends AppCompatActivity {
     // 🔥 LOGIKA HAPUS DATA COMPLETE (Firestore + Local + Auth) 🔥
     private void deleteAccountPermanently() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) return;
+        if (user == null)
+            return;
 
         Toast.makeText(this, "Menghapus data...", Toast.LENGTH_SHORT).show();
         String uid = user.getUid();
@@ -550,7 +569,8 @@ public class SettingsActivity extends AppCompatActivity {
     private void wipeLocalDataAndAuth(FirebaseUser user) {
         mExecutor.execute(() -> {
             try {
-                // 1. Coba batalkan semua alarm (Looping manual karena DAO getAllTasksSync mungkin tidak ada)
+                // 1. Coba batalkan semua alarm (Looping manual karena DAO getAllTasksSync
+                // mungkin tidak ada)
                 // Note: Cara terbaik membatalkan alarm tanpa ID adalah menghapus datanya,
                 // AlarmManager akan gagal firing jika pendingIntent tidak valid/data null.
 
@@ -572,7 +592,8 @@ public class SettingsActivity extends AppCompatActivity {
     private void deleteFirebaseAuthUser(FirebaseUser user) {
         user.delete().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                Toast.makeText(SettingsActivity.this, getString(R.string.msg_account_deleted), Toast.LENGTH_SHORT).show();
+                Toast.makeText(SettingsActivity.this, getString(R.string.msg_account_deleted), Toast.LENGTH_SHORT)
+                        .show();
                 signOutAndExit();
             } else {
                 try {
@@ -580,12 +601,14 @@ public class SettingsActivity extends AppCompatActivity {
                 } catch (FirebaseAuthRecentLoginRequiredException e) {
                     new AlertDialog.Builder(SettingsActivity.this)
                             .setTitle("Login Ulang Diperlukan")
-                            .setMessage("Demi keamanan, Anda harus logout dan login kembali sebelum menghapus akun ini.")
+                            .setMessage(
+                                    "Demi keamanan, Anda harus logout dan login kembali sebelum menghapus akun ini.")
                             .setPositiveButton("Logout Sekarang", (dialog, which) -> performLogout())
                             .setCancelable(false)
                             .show();
                 } catch (Exception e) {
-                    Toast.makeText(SettingsActivity.this, "Gagal hapus akun: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(SettingsActivity.this, "Gagal hapus akun: " + e.getMessage(), Toast.LENGTH_LONG)
+                            .show();
                 }
             }
         });
@@ -637,15 +660,42 @@ public class SettingsActivity extends AppCompatActivity {
         btnChangePassword.setOnClickListener(v -> showChangePasswordDialog());
         btnDeleteAccount.setOnClickListener(v -> showDeleteAccountDialog());
 
+        View cardStatsContainer = findViewById(R.id.cardStatsContainer);
+        if (cardStatsContainer != null) {
+            cardStatsContainer.setOnClickListener(v -> {
+                startActivity(new Intent(this, DashboardActivity.class));
+            });
+        }
+
         if (btnEditName != null) {
             btnEditName.setOnClickListener(v -> showEditNameDialog());
         }
 
         cardProfileImage.setOnClickListener(v -> {
             if (currentImageModel != null) {
+                Intent intent = new Intent(this, ImagePreviewActivity.class);
+                boolean hasValidUri = false;
+
                 if (previewUri != null) {
-                    Intent intent = new Intent(this, ImagePreviewActivity.class);
                     intent.putExtra("IMAGE_URI", previewUri.toString());
+                    hasValidUri = true;
+                } else if (currentImageModel instanceof byte[]) {
+                    // Jika gambar berasal dari Drive (berupa byte array)
+                    try {
+                        java.io.File tempFile = new java.io.File(getCacheDir(), "temp_profile.jpg");
+                        java.io.FileOutputStream fos = new java.io.FileOutputStream(tempFile);
+                        fos.write((byte[]) currentImageModel);
+                        fos.close();
+                        
+                        intent.putExtra("IMAGE_URI", Uri.fromFile(tempFile).toString());
+                        hasValidUri = true;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(this, "Gagal membuka mode layar penuh.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                if (hasValidUri) {
                     try {
                         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                                 this, imgProfile, "profile_transform");
@@ -653,8 +703,6 @@ public class SettingsActivity extends AppCompatActivity {
                     } catch (Exception e) {
                         startActivity(intent);
                     }
-                } else {
-                    Toast.makeText(this, "Foto tersinkron dari Drive", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 Toast.makeText(this, getString(R.string.msg_photo_not_ready), Toast.LENGTH_SHORT).show();
@@ -675,7 +723,8 @@ public class SettingsActivity extends AppCompatActivity {
             intent.setData(Uri.parse("mailto:adityanovaldy721@gmail.com"));
             try {
                 startActivity(Intent.createChooser(intent, "Kirim email:"));
-            } catch (Exception ex) {}
+            } catch (Exception ex) {
+            }
         });
 
         switchNotification.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -701,8 +750,8 @@ public class SettingsActivity extends AppCompatActivity {
             if (buttonView.isPressed()) {
                 sharedPreferences.edit().putBoolean(KEY_DARK_MODE, isChecked).apply();
                 buttonView.postDelayed(() -> {
-                    AppCompatDelegate.setDefaultNightMode(isChecked ?
-                            AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+                    AppCompatDelegate.setDefaultNightMode(
+                            isChecked ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
                 }, 200);
             }
         });
@@ -713,7 +762,8 @@ public class SettingsActivity extends AppCompatActivity {
             NotificationChannel channel = new NotificationChannel(
                     CHANNEL_ID, getString(R.string.notif_channel_name), NotificationManager.IMPORTANCE_HIGH);
             NotificationManager nm = getSystemService(NotificationManager.class);
-            if (nm != null) nm.createNotificationChannel(channel);
+            if (nm != null)
+                nm.createNotificationChannel(channel);
         }
     }
 
@@ -744,13 +794,15 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void loadStatistics() {
-        if (taskViewModel == null) return;
+        if (taskViewModel == null)
+            return;
         taskViewModel.getSearchResults().observe(this, tasks -> {
             if (tasks != null) {
                 int total = tasks.size();
                 int done = 0;
                 for (com.taskmateaditya.data.Task t : tasks) {
-                    if (t.isCompleted()) done++;
+                    if (t.isCompleted())
+                        done++;
                 }
                 tvStatTotal.setText(String.valueOf(total));
                 tvStatDone.setText(String.valueOf(done));
@@ -779,29 +831,35 @@ public class SettingsActivity extends AppCompatActivity {
             // --- KODE TEST MODE (SELESAI) ---
 
             // Hapus logika "besok" sementara agar alarm bunyi hari ini juga
-            /* if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
-                calendar.add(Calendar.DAY_OF_YEAR, 1);
-            }
-
+            /*
+             * if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
+             * calendar.add(Calendar.DAY_OF_YEAR, 1);
+             * }
+             * 
              */
             if (alarmManager != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                            pendingIntent);
                 } else {
-                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                            AlarmManager.INTERVAL_DAY, pendingIntent);
                 }
             }
             Toast.makeText(this, getString(R.string.msg_reminder_on), Toast.LENGTH_SHORT).show();
         } else {
-            if (alarmManager != null) alarmManager.cancel(pendingIntent);
+            if (alarmManager != null)
+                alarmManager.cancel(pendingIntent);
             Toast.makeText(this, getString(R.string.msg_reminder_off), Toast.LENGTH_SHORT).show();
         }
     }
 
     private void checkNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_CODE_POST_NOTIFICATIONS);
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.POST_NOTIFICATIONS },
+                        REQUEST_CODE_POST_NOTIFICATIONS);
             }
         }
     }

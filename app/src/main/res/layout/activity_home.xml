@@ -1,281 +1,584 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/colorBackground">
+    android:background="@color/tm_background">
 
+    <!-- Top Artistic Shape Decoration -->
     <View
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="-100dp"
-        android:layout_marginEnd="-100dp"
-        android:alpha="0.05"
-        android:background="@drawable/bg_circle_faded"/>
+        android:layout_width="400dp"
+        android:layout_height="400dp"
+        android:background="@drawable/bg_circle_faded"
+        android:alpha="0.04"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="-180dp"
+        android:layout_marginEnd="-100dp" />
 
-    <RelativeLayout
+    <!-- Highly Modern Header -->
+    <LinearLayout
         android:id="@+id/headerLayout"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingTop="24dp"
-        android:paddingBottom="12dp"
-        android:paddingHorizontal="24dp">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="42dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
-            android:id="@+id/logoGroup"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="?attr/colorSurface">
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_tm_logo" />
-            </androidx.cardview.widget.CardView>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="TaskMate"
-                android:textColor="#00C853"
-                android:textStyle="bold"
-                android:textSize="20sp"
-                android:fontFamily="serif"
-                android:layout_marginStart="12dp"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true">
-
-            <ImageButton
-                android:id="@+id/btnSort"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:src="@drawable/ic_baseline_sort_24"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                app:tint="?android:attr/textColorPrimary" />
-
-            <ImageButton
-                android:id="@+id/btnNotification"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:src="@drawable/ic_baseline_notifications_24"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                app:tint="?android:attr/textColorPrimary"/>
-
-            <ImageButton
-                android:id="@+id/btnSettings"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:src="@drawable/ic_baseline_settings_24"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                app:tint="?android:attr/textColorPrimary"
-                android:layout_marginStart="8dp"/>
-        </LinearLayout>
-    </RelativeLayout>
-
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/headerLayout"
-        android:fillViewport="true"
-        android:scrollbars="none">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="100dp">
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginHorizontal="24dp"
-                android:layout_marginTop="8dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp"
-                app:cardBackgroundColor="?attr/colorSurface">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="16dp">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_baseline_search_24"
-                        app:tint="?android:attr/textColorSecondary" />
-
-                    <EditText
-                        android:id="@+id/editTextSearch"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@null"
-                        android:hint="Cari tugas..."
-                        android:textSize="15sp"
-                        android:paddingHorizontal="12dp"
-                        android:inputType="text"
-                        android:textColor="?android:attr/textColorPrimary"
-                        android:textColorHint="?android:attr/textColorSecondary"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <HorizontalScrollView
-                android:id="@+id/filterScrollView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollbars="none"
-                android:layout_marginTop="20dp"
-                android:paddingHorizontal="24dp"
-                android:clipToPadding="false">
-
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/chipGroupCategory"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:singleSelection="true"
-                    app:selectionRequired="true">
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipAll"
-                        style="@style/Widget.Material3.Chip.Filter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Semua"
-                        android:checked="true" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipKuliah"
-                        style="@style/Widget.Material3.Chip.Filter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Sekolah/Kuliah" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipPribadi"
-                        style="@style/Widget.Material3.Chip.Filter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pribadi" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipKerja"
-                        style="@style/Widget.Material3.Chip.Filter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pekerjaan" />
-
-                </com.google.android.material.chip.ChipGroup>
-            </HorizontalScrollView>
+            android:layout_weight="1"
+            android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/emptyStateLayout"
-                android:layout_width="match_parent"
+                android:id="@+id/layoutHeaderBriefing"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="400dp"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="32dp">
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
-                    android:layout_width="160dp"
-                    android:layout_height="160dp"
-                    android:src="@drawable/ic_empty_task"
-                    android:alpha="0.8"/>
+                    android:id="@+id/ivMagicSparkle"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_baseline_auto_awesome_24"
+                    app:tint="@color/tm_green"
+                    android:layout_marginEnd="6dp" />
 
                 <TextView
+                    android:id="@+id/tvHeaderSmallGreeting"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Belum ada tugas"
+                    android:text="Halo, Semangat Ya!"
+                    android:textColor="@color/tm_gray"
+                    android:textSize="13sp"
                     android:textStyle="bold"
-                    android:textSize="18sp"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:layout_marginTop="16dp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ketuk tombol + untuk mulai mencatat tugas cerdasmu."
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:gravity="center"
-                    android:layout_marginTop="8dp"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnAddTaskEmpty"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:text="Tambah Tugas Pertama"
-                    android:backgroundTint="#00C853"
-                    app:cornerRadius="12dp" />
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.05"
+                    android:fontFamily="sans-serif-medium" />
             </LinearLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewTasks"
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="0dp"
-                android:clipToPadding="false"
-                android:nestedScrollingEnabled="false"
-                android:visibility="gone"
-                tools:listitem="@layout/item_task"/>
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="4dp">
 
+                <TextView
+                    android:id="@+id/tvHeaderGreeting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Task Mate"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="-0.03"
+                    android:textColor="@color/tm_black"/>
+                
+                <androidx.cardview.widget.CardView
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    app:cardElevation="0dp"
+                    app:cardCornerRadius="3dp"
+                    app:cardBackgroundColor="@color/tm_green"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginBottom="8dp"/>
+
+                <!-- Original requested logo next to text -->
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_tm_logo"
+                    android:layout_marginStart="8dp"
+                    android:alpha="0.9"/>
+
+            </LinearLayout>
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAiChat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="96dp"
-        android:src="@drawable/ic_ai_sparkle"
-        app:fabSize="normal"
-        app:backgroundTint="@color/tm_green"
-        app:tint="@android:color/white"
-        app:borderWidth="0dp"
-        app:elevation="8dp"
-        android:contentDescription="Tanya AI"/>
+        <!-- Elegant Action Group -->
+        <ImageButton
+            android:id="@+id/btnSort"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_baseline_sort_24"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="@color/tm_black"
+            android:layout_marginEnd="6dp"/>
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/btnAddTaskFab"
-        android:layout_width="wrap_content"
+        <ImageButton
+            android:id="@+id/btnNotification"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_baseline_notifications_24"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="@color/tm_black"
+            android:layout_marginEnd="6dp"/>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            app:cardCornerRadius="21dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/chat_avatar_bg">
+            
+            <ImageButton
+                android:id="@+id/btnSettings"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_baseline_settings_24"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/tm_green" />
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <!-- Material Design Search Pill -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/searchCardContainer"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="8dp"
+        app:cardCornerRadius="26dp"
+        app:cardElevation="3dp"
+        app:cardBackgroundColor="@color/tm_card_background"
+        app:layout_constraintTop_toBottomOf="@id/headerLayout">
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="18dp">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_baseline_search_24"
+                app:tint="@color/tm_gray_light" />
+
+            <EditText
+                android:id="@+id/editTextSearch"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:hint="Cari tugas apa hari ini?"
+                android:textSize="15sp"
+                android:inputType="text"
+                android:layout_marginStart="14dp"
+                android:textColor="@color/tm_black"
+                android:textColorHint="@color/tm_gray_light"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Clean Horizontal Chips -->
+    <HorizontalScrollView
+        android:id="@+id/filterScrollView"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="24dp"
-        android:text="Tugas"
-        android:textColor="@android:color/white"
-        app:icon="@drawable/ic_baseline_add_24"
-        app:iconTint="@android:color/white"
-        app:backgroundTint="#00C853"
-        app:elevation="8dp" />
+        android:layout_marginTop="22dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="24dp"
+        android:scrollbars="none"
+        app:layout_constraintTop_toBottomOf="@id/searchCardContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupCategory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:selectionRequired="true"
+            app:singleLine="true"
+            app:singleSelection="true"
+            app:chipSpacingHorizontal="10dp">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipAll"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Semua"
+                app:chipCornerRadius="16dp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipKuliah"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sekolah/Kuliah"
+                app:chipCornerRadius="16dp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipPribadi"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pribadi"
+                app:chipCornerRadius="16dp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipKerja"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pekerjaan"
+                app:chipCornerRadius="16dp" />
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
+
+    <!-- Dynamic Content Area -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filterScrollView">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewTasks"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="120dp"
+            android:paddingHorizontal="20dp"
+            android:visibility="gone"
+            tools:visibility="gone"
+            tools:listitem="@layout/item_task"/>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!-- Exquisite Empty State Area -->
+    <LinearLayout
+        android:id="@+id/emptyStateLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp"
+        tools:visibility="visible"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filterScrollView">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            app:cardCornerRadius="80dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/tm_card_background"
+            android:layout_marginBottom="24dp">
+            
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="32dp"
+                android:alpha="0.8"
+                android:src="@drawable/ic_empty_task" />
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Jadwalmu Masih Kosong"
+            android:textColor="@color/tm_black"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:letterSpacing="-0.02" />
+
+        <TextView
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:text="Jangan tunda produktivitasmu. Segera tuangkan ide dan rencanamu hari ini ke dalam TaskMate!"
+            android:textColor="@color/tm_gray"
+            android:textSize="15sp"
+            android:lineSpacingExtra="6dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddTaskEmpty"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:layout_marginTop="36dp"
+            android:text="Mulai Tambah Tugas"
+            app:cornerRadius="16dp"
+            app:backgroundTint="@color/tm_green"
+            android:textColor="@color/white"
+            app:elevation="2dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:paddingHorizontal="32dp"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.0" />
+    </LinearLayout>
 
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        android:layout_centerInParent="true" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-</RelativeLayout>
+    <!-- ============================================ -->
+    <!-- Speed Dial FAB Group                        -->
+    <!-- ============================================ -->
+
+    <!-- Scrim / Overlay backdrop -->
+    <View
+        android:id="@+id/fabScrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#99000000"
+        android:visibility="gone"
+        android:alpha="0"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Speed Dial Container (all items aligned to bottom-end) -->
+
+    <!-- Sub-item 5: Focus Timer -->
+    <LinearLayout
+        android:id="@+id/fabItemTimer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="338dp"
+        android:visibility="gone"
+        android:alpha="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/labelFabTimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Focus Timer"
+            android:textColor="#1A1A2E"
+            android:textSize="13sp"
+            android:fontFamily="sans-serif-medium"
+            android:background="@drawable/bg_fab_label"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="8dp"
+            android:layout_marginEnd="12dp"
+            android:elevation="4dp"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabFocusTimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="Focus Timer"
+            android:src="@drawable/ic_baseline_calendar_today_24"
+            app:backgroundTint="#EF4444"
+            app:tint="@color/white"
+            app:elevation="6dp"
+            app:fabSize="mini"
+            app:borderWidth="0dp" />
+    </LinearLayout>
+
+    <!-- Sub-item 4: Scan Photo -->
+    <LinearLayout
+        android:id="@+id/fabItemScan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="276dp"
+        android:visibility="gone"
+        android:alpha="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/labelFabScan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Scan Foto"
+            android:textColor="#1A1A2E"
+            android:textSize="13sp"
+            android:fontFamily="sans-serif-medium"
+            android:background="@drawable/bg_fab_label"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="8dp"
+            android:layout_marginEnd="12dp"
+            android:elevation="4dp"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabScanTask"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="Scan Task"
+            android:src="@drawable/ic_baseline_photo_camera_24"
+            app:backgroundTint="#3B82F6"
+            app:tint="@color/white"
+            app:elevation="6dp"
+            app:fabSize="mini"
+            app:borderWidth="0dp" />
+    </LinearLayout>
+
+    <!-- Sub-item 3: AI Chat -->
+    <LinearLayout
+        android:id="@+id/fabItemAi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="214dp"
+        android:visibility="gone"
+        android:alpha="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/labelFabAi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="AI Assistant"
+            android:textColor="#1A1A2E"
+            android:textSize="13sp"
+            android:fontFamily="sans-serif-medium"
+            android:background="@drawable/bg_fab_label"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="8dp"
+            android:layout_marginEnd="12dp"
+            android:elevation="4dp"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAiChat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="AI Chat"
+            android:src="@drawable/ic_ai_sparkle"
+            app:backgroundTint="@color/tm_black"
+            app:tint="@color/tm_background"
+            app:elevation="6dp"
+            app:fabSize="mini"
+            app:borderWidth="0dp" />
+    </LinearLayout>
+
+    <!-- Sub-item 2: Voice Task -->
+    <LinearLayout
+        android:id="@+id/fabItemVoice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="152dp"
+        android:visibility="gone"
+        android:alpha="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/labelFabVoice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Input Suara"
+            android:textColor="#1A1A2E"
+            android:textSize="13sp"
+            android:fontFamily="sans-serif-medium"
+            android:background="@drawable/bg_fab_label"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="8dp"
+            android:layout_marginEnd="12dp"
+            android:elevation="4dp"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabVoiceTask"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="Voice Task"
+            android:src="@drawable/ic_baseline_mic_24"
+            app:backgroundTint="@color/tm_card_background"
+            app:tint="@color/tm_green"
+            app:elevation="6dp"
+            app:fabSize="mini"
+            app:borderWidth="0dp" />
+    </LinearLayout>
+
+    <!-- Sub-item 1: Tambah Tugas -->
+    <LinearLayout
+        android:id="@+id/fabItemAddTask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="90dp"
+        android:visibility="gone"
+        android:alpha="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/labelFabAddTask"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tambah Tugas"
+            android:textColor="#1A1A2E"
+            android:textSize="13sp"
+            android:fontFamily="sans-serif-medium"
+            android:background="@drawable/bg_fab_label"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="8dp"
+            android:layout_marginEnd="12dp"
+            android:elevation="4dp"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAddTask"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="Tambah Tugas"
+            android:src="@drawable/ic_baseline_add_24"
+            app:backgroundTint="@color/tm_green"
+            app:tint="@color/white"
+            app:elevation="6dp"
+            app:fabSize="mini"
+            app:borderWidth="0dp" />
+    </LinearLayout>
+
+    <!-- Main FAB (Toggle Speed Dial) -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnAddTaskFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="28dp"
+        android:contentDescription="Menu Aksi"
+        android:src="@drawable/ic_baseline_add_24"
+        app:backgroundTint="@color/tm_green"
+        app:tint="@color/white"
+        app:elevation="12dp"
+        app:fabSize="normal"
+        app:borderWidth="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

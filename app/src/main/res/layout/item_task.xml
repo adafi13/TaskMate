@@ -3,22 +3,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp"
+    android:layout_marginHorizontal="20dp"
     android:layout_marginBottom="12dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="2dp"
-    app:strokeWidth="0dp"
-    app:cardBackgroundColor="?attr/colorSurface">
+    app:cardCornerRadius="20dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/tm_divider"
+    app:cardBackgroundColor="@color/tm_card_background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="8dp">
 
         <CheckBox
             android:id="@+id/checkBoxCompleted"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:button="@drawable/selector_checkbox"
             android:minWidth="0dp"
             android:minHeight="0dp"
@@ -26,13 +30,14 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/textViewTitle" />
 
-        <View
+        <androidx.cardview.widget.CardView
             android:id="@+id/priorityIndicator"
-            android:layout_width="4dp"
+            android:layout_width="6dp"
             android:layout_height="0dp"
-            android:layout_marginVertical="2dp"
-            android:layout_marginStart="12dp"
-            android:background="#00C853"
+            android:layout_marginStart="14dp"
+            app:cardCornerRadius="3dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/tm_green"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/checkBoxCompleted"
             app:layout_constraintTop_toTopOf="parent" />
@@ -41,14 +46,15 @@
             android:id="@+id/textViewTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="14dp"
             android:layout_marginEnd="8dp"
             android:ellipsize="end"
             android:fontFamily="sans-serif-medium"
             android:maxLines="1"
             android:text="Judul Tugas"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textSize="16sp"
+            android:textColor="@color/tm_black"
+            android:textSize="17sp"
+            android:letterSpacing="-0.01"
             app:layout_constraintEnd_toStartOf="@+id/btnDeleteTask"
             app:layout_constraintStart_toEndOf="@id/priorityIndicator"
             app:layout_constraintTop_toTopOf="parent" />
@@ -57,7 +63,7 @@
             android:id="@+id/badgeContainer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="8dp"
             android:orientation="horizontal"
             app:layout_constraintStart_toStartOf="@id/textViewTitle"
             app:layout_constraintTop_toBottomOf="@id/textViewTitle">
@@ -67,12 +73,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_category_badge"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="3dp"
+                android:backgroundTint="@color/chat_avatar_bg"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
                 android:text="Kategori"
-                android:textColor="#616161"
+                android:textColor="@color/tm_green"
                 android:textSize="10sp"
-                android:textStyle="bold" />
+                android:fontFamily="sans-serif-medium" />
 
             <TextView
                 android:id="@+id/textViewPriority"
@@ -80,20 +87,20 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:background="@drawable/bg_category_badge"
-                android:backgroundTint="#F5F5F5"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="3dp"
+                android:backgroundTint="@color/tm_background"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
                 android:text="Tinggi"
-                android:textColor="#424242"
+                android:textColor="@color/tm_gray"
                 android:textSize="10sp"
-                android:textStyle="bold" />
+                android:fontFamily="sans-serif-medium" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/infoLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="16dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -104,7 +111,7 @@
                 android:layout_width="14dp"
                 android:layout_height="14dp"
                 android:src="@drawable/ic_baseline_calendar_today_24"
-                app:tint="?android:attr/textColorSecondary" />
+                app:tint="@color/tm_gray_light" />
 
             <TextView
                 android:id="@+id/textViewDeadline"
@@ -113,22 +120,34 @@
                 android:layout_marginStart="6dp"
                 android:fontFamily="sans-serif"
                 android:text="27 Des 2025"
-                android:textColor="?android:attr/textColorSecondary"
+                android:textColor="@color/tm_gray"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/textViewSubtaskProgress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:fontFamily="sans-serif"
+                android:text="🔗 2/4 Detail"
+                android:textColor="@color/tm_gray"
+                android:visibility="gone"
+                android:textStyle="bold"
                 android:textSize="12sp" />
         </LinearLayout>
 
         <ImageButton
             android:id="@+id/btnDeleteTask"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="10dp"
+            android:padding="12dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_baseline_delete_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="#FF8A80" />
+            app:tint="@color/tm_gray_light" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -4,31 +4,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="?android:attr/colorBackground"> <RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="?attr/actionBarSize"
-    android:paddingHorizontal="16dp"
-    android:background="?android:attr/colorBackground">
+    android:background="@color/tm_background"> 
 
-    <ImageButton
-        android:id="@+id/btnBack"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@drawable/ic_baseline_arrow_back_24"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:layout_centerVertical="true"
-        android:contentDescription="Kembali"
-        app:tint="?android:attr/textColorPrimary"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:paddingHorizontal="16dp"
+        android:background="@color/tm_background">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Detail Tugas"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="?android:attr/textColorPrimary"
-        android:layout_centerInParent="true"/>
-</RelativeLayout>
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_baseline_arrow_back_24"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_centerVertical="true"
+            android:contentDescription="Kembali"
+            app:tint="@color/tm_black"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Detail Tugas"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:letterSpacing="-0.01"
+            android:textColor="@color/tm_black"
+            android:layout_centerInParent="true"/>
+    </RelativeLayout>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -43,100 +46,177 @@
             android:orientation="vertical"
             android:padding="20dp">
 
+            <!-- Card 1: Informasi Utama -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="?attr/colorSurface">
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/tm_divider"
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="@color/tm_card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="24dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Informasi Utama"
+                        android:text="INFORMASI UTAMA"
                         android:textStyle="bold"
-                        android:textColor="#00C853"
-                        android:textSize="14sp"
-                        android:layout_marginBottom="16dp"/>
+                        android:letterSpacing="0.05"
+                        android:textColor="@color/tm_gray_light"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="20dp"/>
 
                     <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
+                        android:layout_marginBottom="20dp"
                         android:hint="Judul Tugas"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp"
-                        app:boxStrokeColor="#00C853">
+                        app:boxCornerRadiusTopStart="16dp"
+                        app:boxCornerRadiusTopEnd="16dp"
+                        app:boxCornerRadiusBottomStart="16dp"
+                        app:boxCornerRadiusBottomEnd="16dp"
+                        app:boxStrokeColor="@color/tm_green">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/editTextTitle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="textCapSentences"
-                            android:textColor="?android:attr/textColorPrimary"/>
+                            android:paddingVertical="18dp"
+                            android:textColor="@color/tm_black"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Mata Kuliah (Opsional)"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp"
-                        app:boxStrokeColor="#00C853">
+                        app:boxCornerRadiusTopStart="16dp"
+                        app:boxCornerRadiusTopEnd="16dp"
+                        app:boxCornerRadiusBottomStart="16dp"
+                        app:boxCornerRadiusBottomEnd="16dp"
+                        app:boxStrokeColor="@color/tm_green">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/editTextMataKuliah"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="textCapSentences"
-                            android:textColor="?android:attr/textColorPrimary"/>
+                            android:paddingVertical="18dp"
+                            android:textColor="@color/tm_black"/>
                     </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- AI Smart Categorization badge -->
+                    <TextView
+                        android:id="@+id/tvAiSuggestionBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:background="@drawable/bg_category_badge"
+                        android:backgroundTint="@color/chat_avatar_bg"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="6dp"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/tm_green"
+                        android:text="🤖 AI mengatur kategori otomatis"
+                        android:visibility="gone"/>
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Card 1.5: Sub-Tugas / Checklist -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="?attr/colorSurface">
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/tm_divider"
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="@color/tm_card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="24dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Batas Waktu"
+                        android:text="DAFTAR SUB-TUGAS"
                         android:textStyle="bold"
-                        android:textColor="#00C853"
+                        android:letterSpacing="0.05"
+                        android:textColor="@color/tm_gray_light"
+                        android:textSize="12sp"
                         android:layout_marginBottom="16dp"/>
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvSubtasks"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
+                        android:nestedScrollingEnabled="false"
+                        android:layout_marginBottom="12dp"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAddSubtask"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+ Tambah Langkah"
+                        android:textColor="@color/tm_green"
+                        android:layout_gravity="start"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Card 2: Batas Waktu & Kategori -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/tm_divider"
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="@color/tm_card_background">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PENJADWALAN"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.05"
+                        android:textColor="@color/tm_gray_light"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="20dp"/>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
                         app:startIconDrawable="@drawable/ic_baseline_calendar_today_24"
+                        app:startIconTint="@color/tm_gray_light"
+                        app:boxCornerRadiusTopStart="16dp"
+                        app:boxCornerRadiusTopEnd="16dp"
+                        app:boxCornerRadiusBottomStart="16dp"
+                        app:boxCornerRadiusBottomEnd="16dp"
                         android:hint="Pilih Tanggal">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -145,7 +225,8 @@
                             android:layout_height="wrap_content"
                             android:focusable="false"
                             android:clickable="true"
-                            android:textColor="?android:attr/textColorPrimary"/>
+                            android:paddingVertical="18dp"
+                            android:textColor="@color/tm_black"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <LinearLayout
@@ -154,122 +235,165 @@
                         android:orientation="horizontal">
 
                         <com.google.android.material.textfield.TextInputLayout
-                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="10dp"
+                            app:boxCornerRadiusTopStart="16dp"
+                            app:boxCornerRadiusTopEnd="16dp"
+                            app:boxCornerRadiusBottomStart="16dp"
+                            app:boxCornerRadiusBottomEnd="16dp"
                             android:hint="Prioritas">
                             <AutoCompleteTextView
                                 android:id="@+id/editTextPriority"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:paddingVertical="18dp"
+                                android:textColor="@color/tm_black"
                                 android:inputType="none"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
-                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginStart="8dp"
+                            android:layout_marginStart="10dp"
+                            app:boxCornerRadiusTopStart="16dp"
+                            app:boxCornerRadiusTopEnd="16dp"
+                            app:boxCornerRadiusBottomStart="16dp"
+                            app:boxCornerRadiusBottomEnd="16dp"
                             android:hint="Kategori">
                             <AutoCompleteTextView
                                 android:id="@+id/editTextCategory"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:paddingVertical="18dp"
+                                android:textColor="@color/tm_black"
                                 android:inputType="none"/>
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Card 3: Pengingat & Lampiran -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="?attr/colorSurface">
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/tm_divider"
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="@color/tm_card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:paddingTop="16dp"
+                    android:paddingBottom="24dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="12dp">
+                        android:paddingHorizontal="24dp"
+                        android:layout_marginBottom="16dp">
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Pengingat Aktif"
-                            android:textStyle="bold"
-                            android:textColor="#00C853"/>
+                            android:text="Notifikasi Alarm"
+                            android:textSize="16sp"
+                            android:textColor="@color/tm_black"/>
                         <com.google.android.material.materialswitch.MaterialSwitch
                             android:id="@+id/switchReminder"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
+                            android:layout_height="wrap_content"
+                            app:thumbTint="@color/tm_green"/>
                     </LinearLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Waktu Alarm"
-                        app:startIconDrawable="@drawable/ic_baseline_notifications_24">
+                        android:layout_marginHorizontal="24dp"
+                        android:layout_marginBottom="24dp"
+                        app:startIconDrawable="@drawable/ic_baseline_notifications_24"
+                        app:startIconTint="@color/tm_gray_light"
+                        app:boxCornerRadiusTopStart="16dp"
+                        app:boxCornerRadiusTopEnd="16dp"
+                        app:boxCornerRadiusBottomStart="16dp"
+                        app:boxCornerRadiusBottomEnd="16dp"
+                        android:hint="Waktu Tepat Alarm">
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/editTextTime"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:focusable="false"
                             android:clickable="true"
-                            android:textColor="?android:attr/textColorPrimary"/>
+                            android:paddingVertical="18dp"
+                            android:textColor="@color/tm_black"/>
                     </com.google.android.material.textfield.TextInputLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp"
-                app:cardBackgroundColor="?attr/colorSurface">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/tm_divider"
+                        android:layout_marginBottom="24dp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Lampiran &amp; Catatan"
+                        android:text="CATATAN TAMBAHAN"
                         android:textStyle="bold"
-                        android:textColor="#00C853"
+                        android:paddingHorizontal="24dp"
+                        android:letterSpacing="0.05"
+                        android:textColor="@color/tm_gray_light"
+                        android:textSize="12sp"
                         android:layout_marginBottom="16dp"/>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="24dp"
+                        android:layout_marginBottom="20dp"
+                        app:boxCornerRadiusTopStart="16dp"
+                        app:boxCornerRadiusTopEnd="16dp"
+                        app:boxCornerRadiusBottomStart="16dp"
+                        app:boxCornerRadiusBottomEnd="16dp"
+                        android:hint="Deskripsi bebas">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/editTextNotes"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:minLines="3"
+                            android:gravity="top"
+                            android:inputType="textMultiLine"
+                            android:paddingVertical="18dp"
+                            android:textColor="@color/tm_black"/>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:layout_marginBottom="16dp">
+                        android:paddingHorizontal="24dp">
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnAttachFile"
                             style="@style/Widget.Material3.Button.OutlinedButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Upload"
+                            android:text="Upload Berkas"
+                            android:textColor="@color/tm_black"
+                            app:strokeColor="@color/tm_divider"
+                            app:iconTint="@color/tm_gray"
                             app:icon="@drawable/ic_baseline_add_24"/>
 
                         <LinearLayout
@@ -280,7 +404,7 @@
                             android:layout_marginStart="12dp"
                             android:orientation="horizontal"
                             android:background="@drawable/bg_rounded_dialog"
-                            android:backgroundTint="?android:attr/colorBackground"
+                            android:backgroundTint="@color/tm_background"
                             android:padding="8dp"
                             android:gravity="center_vertical"
                             android:visibility="gone">
@@ -290,30 +414,113 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:textSize="12sp"
-                                android:textColor="?android:attr/textColorPrimary"/>
+                                android:textColor="@color/tm_black"/>
                             <ImageView
                                 android:id="@+id/btnRemoveAttachment"
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:src="@drawable/ic_baseline_delete_24"
-                                app:tint="#FF5252"/>
+                                app:tint="@color/tm_red_error"/>
                         </LinearLayout>
                     </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            <!-- Card 4: AI Subtasks Generation -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/tm_divider"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@color/tm_card_background">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="20dp"
+                    android:paddingHorizontal="24dp"
+                    android:paddingBottom="24dp">
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Tambahkan Catatan">
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/editTextNotes"
-                            android:layout_width="match_parent"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="0dp"
+                            app:cardBackgroundColor="@color/chat_avatar_bg"
+                            android:layout_marginEnd="12dp">
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_ai_sparkle"
+                                app:tint="@color/tm_green"
+                                android:contentDescription="AI Icon"/>
+                        </androidx.cardview.widget.CardView>
+
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:minLines="3"
-                            android:gravity="top"
-                            android:inputType="textMultiLine"
-                            android:textColor="?android:attr/textColorPrimary"/>
-                    </com.google.android.material.textfield.TextInputLayout>
+                            android:text="Asisten AI TaskMate"
+                            android:textStyle="bold"
+                            android:textColor="@color/tm_black"
+                            android:textSize="15sp"/>
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnGenerateSubtasks"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:text="Pecah Tugas Menjadi Sub-Tugas"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:backgroundTint="@color/tm_green"
+                        app:cornerRadius="16dp"
+                        android:layout_marginBottom="12dp"/>
+
+                    <ProgressBar
+                        android:id="@+id/progressBarAi"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center_horizontal"
+                        android:indeterminateTint="@color/tm_green"
+                        android:visibility="gone"
+                        android:layout_marginBottom="12dp"/>
+
+                    <TextView
+                        android:id="@+id/tvSubtaskResult"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_rounded_dialog"
+                        android:backgroundTint="@color/tm_background"
+                        android:padding="16dp"
+                        android:textSize="14sp"
+                        android:lineSpacingMultiplier="1.4"
+                        android:textColor="@color/tm_black"
+                        android:visibility="gone"
+                        android:layout_marginBottom="16dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSaveSubtasks"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:text="Simpan Rekomendasi ke Catatan"
+                        app:strokeColor="@color/tm_divider"
+                        android:textColor="@color/tm_black"
+                        app:cornerRadius="14dp"
+                        android:visibility="gone"/>
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -328,29 +535,31 @@
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:padding="16dp"
-        android:background="?android:attr/colorBackground"
-        android:elevation="8dp">
+        android:background="@color/tm_card_background"
+        android:elevation="12dp">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnDelete"
             style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="0dp"
-            android:layout_height="56dp"
+            android:layout_height="60dp"
             android:layout_weight="1"
             android:text="Hapus"
-            android:textColor="#FF5252"
-            app:strokeColor="#FF5252"
+            android:textColor="@color/tm_red_error"
+            app:strokeColor="@color/tm_red_error"
             app:cornerRadius="16dp"
             android:layout_marginEnd="12dp"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnUpdate"
             android:layout_width="0dp"
-            android:layout_height="56dp"
+            android:layout_height="60dp"
             android:layout_weight="2"
-            android:text="Simpan"
-            android:backgroundTint="#00C853"
+            android:text="Simpan Perubahan"
+            android:backgroundTint="@color/tm_green"
             app:cornerRadius="16dp"
+            android:textColor="@color/white"
+            android:textSize="16sp"
             android:textStyle="bold"/>
     </LinearLayout>
 

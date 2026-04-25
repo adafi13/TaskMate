@@ -58,7 +58,7 @@
     <string name="btn_change_password">Ubah Password</string>  <string name="btn_logout">Keluar dari Akun</string>
     <string name="btn_delete_account">Hapus Akun Permanen</string> <string name="app_credit">TaskMate by Aditya</string>
     <string name="app_version_prefix">Versi</string>
-    <string name="app_academic_credit">Dibuat untuk pembelajaran Pemrograman Mobile 1\nDosen Pengampu: Donny Maulana, S.Kom., M.M.S.I.</string>
+    <string name="app_academic_credit">Dibuat untuk pembelajaran Pemrograman Mobile 2\nDosen Pengampu: Donny Maulana, S.Kom., M.M.S.I.</string>
 
     <string name="notif_channel_name">TaskMate Notifications</string>
     <string name="notif_active_title">Notifikasi Aktif</string>

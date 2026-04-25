@@ -3,6 +3,7 @@ package com.taskmateaditya.data;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import androidx.room.Ignore;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -29,18 +30,23 @@ public class Task implements Serializable {
 
     private String attachmentPath;
 
-
     private String userId;
 
-    public Task() {
+    private long createdAt;
+    private long completedAt; // BARU: Untuk akurasi tracking di Dashboard
+    private String subtasksJson; // BARU: Menyimpan daftar subtask (JSON)
 
+    public Task() {
         this.id = UUID.randomUUID().toString();
+        this.createdAt = System.currentTimeMillis();
+        this.subtasksJson = "[]";
     }
 
-
+    @Ignore
     public Task(String title, String mataKuliah, String deadline, String notes, String priority, String category, boolean isCompleted, long reminderTime, boolean isReminderActive, String attachmentPath) {
 
         this.id = UUID.randomUUID().toString();
+        this.createdAt = System.currentTimeMillis();
 
         this.title = title;
         this.mataKuliah = mataKuliah;
@@ -52,7 +58,7 @@ public class Task implements Serializable {
         this.reminderTime = reminderTime;
         this.isReminderActive = isReminderActive;
         this.attachmentPath = attachmentPath;
-
+        this.subtasksJson = "[]";
     }
 
 
@@ -80,7 +86,14 @@ public class Task implements Serializable {
     public void setCategory(String category) { this.category = category; }
 
     public boolean isCompleted() { return isCompleted; }
-    public void setCompleted(boolean completed) { isCompleted = completed; }
+    public void setCompleted(boolean completed) {
+        this.isCompleted = completed;
+        if (completed && this.completedAt == 0) {
+            this.completedAt = System.currentTimeMillis();
+        } else if (!completed) {
+            this.completedAt = 0;
+        }
+    }
 
     public long getReminderTime() { return reminderTime; }
     public void setReminderTime(long reminderTime) { this.reminderTime = reminderTime; }
@@ -96,4 +109,13 @@ public class Task implements Serializable {
 
     public long getPreReminderTime() { return preReminderTime; }
     public void setPreReminderTime(long preReminderTime) { this.preReminderTime = preReminderTime; }
+
+    public long getCreatedAt() { return createdAt; }
+    public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
+
+    public long getCompletedAt() { return completedAt; }
+    public void setCompletedAt(long completedAt) { this.completedAt = completedAt; }
+
+    public String getSubtasksJson() { return subtasksJson != null ? subtasksJson : "[]"; }
+    public void setSubtasksJson(String subtasksJson) { this.subtasksJson = subtasksJson; }
 }

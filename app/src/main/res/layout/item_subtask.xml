@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_rounded_white"
+    android:orientation="horizontal"
+    android:paddingHorizontal="4dp"
+    android:paddingVertical="4dp"
+    android:layout_marginBottom="8dp"
+    android:gravity="center_vertical">
+
+    <CheckBox
+        android:id="@+id/cbSubtask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:buttonTint="@color/tm_green" />
+
+    <EditText
+        android:id="@+id/etSubtaskTitle"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:hint="Tambahkan detail target..."
+        android:textColor="@color/tm_black"
+        android:textSize="14sp"
+        android:padding="8dp"
+        android:inputType="textCapSentences|textMultiLine"
+        android:maxLines="3"/>
+
+    <ImageButton
+        android:id="@+id/btnDeleteSubtask"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_baseline_close_24"
+        app:tint="@color/tm_gray_light"
+        android:layout_marginEnd="4dp"/>
+</LinearLayout>

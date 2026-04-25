@@ -7,13 +7,23 @@ android {
     namespace 'com.taskmateaditya'
     compileSdk 34
 
+    // Baca local.properties
+    def localProps = new Properties()
+    def localPropsFile = rootProject.file('local.properties')
+    if (localPropsFile.exists()) {
+        localPropsFile.withInputStream { localProps.load(it) }
+    }
+
     defaultConfig {
         applicationId "com.taskmateaditya"
         minSdk 24
         targetSdk 34
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "2.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // Expose API key via BuildConfig
+        buildConfigField "String", "GROQ_API_KEY", "\"${localProps['GROQ_API_KEY'] ?: ''}\""
     }
 
     buildTypes {
@@ -24,12 +34,17 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     buildFeatures {
         viewBinding true
+        buildConfig true
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.compilerArgs << "-Xlint:deprecation" << "-Xlint:unchecked"
     }
 
     packaging {
@@ -54,6 +69,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.core:core-splashscreen:1.0.1'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation 'com.google.android.gms:play-services-location:21.3.0'
 
     // --- Room Database ---
@@ -92,5 +108,10 @@ dependencies {
 
     implementation 'com.squareup.okhttp3:okhttp:4.11.0'
     implementation 'io.noties.markwon:core:4.6.2'
-}
+    
+    // --- CHARTS ---
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
+    // --- ML KIT (OCR) ---
+    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:19.0.0'
+}

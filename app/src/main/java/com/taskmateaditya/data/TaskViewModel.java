@@ -20,15 +20,20 @@ public class TaskViewModel extends AndroidViewModel {
     private final TaskRepository repository;
     private final MutableLiveData<FilterState> currentFilter = new MutableLiveData<>(new FilterState());
     private final LiveData<List<Task>> tasks;
+    private final FirebaseAuth.AuthStateListener authStateListener;
 
-    public enum SortType { NEWEST, DEADLINE, PRIORITY }
+    public enum SortType {
+        NEWEST, DEADLINE, PRIORITY
+    }
 
     public static class FilterState {
         String searchQuery = "";
         SortType sortType = SortType.NEWEST;
         String categoryFilter = null;
 
-        public FilterState() {}
+        public FilterState() {
+        }
+
         public FilterState(String query, SortType sort, String category) {
             this.searchQuery = query;
             this.sortType = sort;
@@ -40,6 +45,17 @@ public class TaskViewModel extends AndroidViewModel {
         super(application);
         repository = new TaskRepository(application);
 
+        // Fix: Force the filter to re-evaluate whenever Firebase auth state is confirmed.
+        // This prevents the switchMap from getting stuck on a static empty list
+        // when getCurrentUserId() returned null on the very first evaluation.
+        authStateListener = auth -> {
+            if (auth.getCurrentUser() != null) {
+                // Re-emit the current filter — switchMap re-runs and picks up the valid userId
+                currentFilter.setValue(currentFilter.getValue());
+            }
+        };
+        FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
+
         tasks = Transformations.switchMap(currentFilter, state -> {
             String userId = getCurrentUserId();
 
@@ -49,24 +65,42 @@ public class TaskViewModel extends AndroidViewModel {
 
             LiveData<List<Task>> rawTasks;
 
-            if (state.searchQuery != null && !state.searchQuery.isEmpty()) {
-                rawTasks = repository.searchTasks(state.searchQuery, userId);
-            } else if (state.categoryFilter != null && !state.categoryFilter.equals("Semua")) {
-                rawTasks = repository.getTasksByCategory(state.categoryFilter, userId);
-            } else {
-                switch (state.sortType) {
-                    case DEADLINE: rawTasks = repository.getTasksSortedByDeadline(userId); break;
-                    case PRIORITY: rawTasks = repository.getTasksSortedByPriority(userId); break;
-                    default: rawTasks = repository.getAllTasks(userId); break;
-                }
+            switch (state.sortType) {
+                case DEADLINE:
+                    rawTasks = repository.getTasksSortedByDeadline(userId);
+                    break;
+                case PRIORITY:
+                    rawTasks = repository.getTasksSortedByPriority(userId);
+                    break;
+                default:
+                    rawTasks = repository.getAllTasks(userId);
+                    break;
             }
 
             return Transformations.map(rawTasks, list -> {
-                if (list == null) return null;
+                if (list == null)
+                    return null;
                 List<Task> activeTasks = new ArrayList<>();
                 List<Task> completedTasks = new ArrayList<>();
 
                 for (Task task : list) {
+                    // Cek Category Filter
+                    if (state.categoryFilter != null && !state.categoryFilter.equals("Semua")) {
+                        if (task.getCategory() == null || !task.getCategory().equals(state.categoryFilter)) {
+                            continue;
+                        }
+                    }
+
+                    // Cek Search Query
+                    if (state.searchQuery != null && !state.searchQuery.isEmpty()) {
+                        String query = state.searchQuery.toLowerCase();
+                        boolean matchTitle = task.getTitle() != null && task.getTitle().toLowerCase().contains(query);
+                        boolean matchSub = task.getMataKuliah() != null && task.getMataKuliah().toLowerCase().contains(query);
+                        if (!matchTitle && !matchSub) {
+                            continue;
+                        }
+                    }
+
                     if (task.isCompleted()) {
                         completedTasks.add(task);
                     } else {
@@ -88,6 +122,38 @@ public class TaskViewModel extends AndroidViewModel {
     public void syncData() {
         if (repository != null) {
             repository.startRealtimeSync();
+        }
+    }
+
+    /** Stop the Firestore realtime listener — call this in Activity.onStop(). */
+    public void stopSync() {
+        if (repository != null) {
+            repository.stopRealtimeSync();
+        }
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        if (authStateListener != null) {
+            FirebaseAuth.getInstance().removeAuthStateListener(authStateListener);
+        }
+        stopSync();
+        if (repository != null) {
+            repository.shutdown();
+        }
+    }
+
+    public void refreshTasksFromCloud() {
+        if (repository != null) {
+            repository.refreshTasksFromCloud();
+        }
+    }
+
+    /** Restore on Login: calls back on main thread after data is written to Room. */
+    public void refreshTasksFromCloud(Runnable onComplete) {
+        if (repository != null) {
+            repository.refreshTasksFromCloud(onComplete);
         }
     }
 
@@ -141,12 +207,14 @@ public class TaskViewModel extends AndroidViewModel {
 
     public void setSearchQuery(String query) {
         FilterState current = currentFilter.getValue();
-        if (current != null) currentFilter.setValue(new FilterState(query, current.sortType, current.categoryFilter));
+        if (current != null)
+            currentFilter.setValue(new FilterState(query, current.sortType, current.categoryFilter));
     }
 
     public void setSortOrder(SortType sort) {
         FilterState current = currentFilter.getValue();
-        if (current != null) currentFilter.setValue(new FilterState(current.searchQuery, sort, current.categoryFilter));
+        if (current != null)
+            currentFilter.setValue(new FilterState(current.searchQuery, sort, current.categoryFilter));
     }
 
     public void setCategoryFilter(String category) {
