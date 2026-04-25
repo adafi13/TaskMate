@@ -3,7 +3,7 @@
 TaskMate adalah aplikasi Android modern yang dirancang untuk membantu pengguna mengelola tugas dan deadline dengan bantuan kecerdasan buatan (AI). Aplikasi ini dibuat untuk memenuhi tugas **UTS Mata Kuliah Pemrograman Mobile 2**.
 
 **Dosen Pengampu:** Donny Maulana, S.Kom., M.M.S.I.  
-**Instansi:** Universitas Pelita Bangsa
+Universitas Pelita Bangsa
 
 ---
 
