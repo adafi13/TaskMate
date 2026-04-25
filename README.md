@@ -76,9 +76,10 @@ TaskMate adalah aplikasi Android modern yang dirancang untuk membantu pengguna m
 
 ## 👨‍💻 Kontributor
 
--   **Nama**: Aditya
--   **Kelas**: IE.22.C.1 (Sesuaikan dengan kelas Anda)
--   **NIM**: (Masukkan NIM Anda di sini)
+-   **Nama**: Muhammad Aditya Novaldy
+-   **Kelas**: I242A
+-   **NIM**: 312410360
+-   **Instansi**: Universitas Pelita Bangsa
 
 ---
 © 2026 TaskMate by Aditya.
